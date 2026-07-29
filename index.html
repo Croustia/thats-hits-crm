@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>That's Hits — CRM</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black: #0a0a0a; --dark: #111; --card: #1a1a1a; --border: #2a2a2a;
+  --gold: #C9A84C; --cream: #F0DFA0; --text: #f0f0f0; --muted: #888;
+  --input: #141414; --green: #059669; --blue: #2563EB; --purple: #7C3AED;
+  --red: #dc2626;
+}
+body { background: var(--black); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
+
+/* LOGIN */
+#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+.login-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px 36px; width: 100%; max-width: 380px; text-align:center; }
+.login-logo { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 6px; }
+.login-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+.login-box input { width:100%; background: var(--input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; padding: 11px 14px; outline: none; margin-bottom: 12px; }
+.login-box input:focus { border-color: var(--gold); }
+.btn-login { width:100%; background: var(--gold); color: var(--black); font-size: 14px; font-weight: 700; border: none; border-radius: 6px; padding: 12px; cursor: pointer; letter-spacing: 1px; margin-bottom: 12px; }
+.btn-login:hover { background: var(--cream); }
+.btn-readonly { width:100%; background: transparent; color: var(--muted); font-size: 13px; border: 1px solid var(--border); border-radius: 6px; padding: 10px; cursor: pointer; }
+.btn-readonly:hover { border-color: var(--muted); color: var(--text); }
+.login-err { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 18px; }
+
+.btn-sign-link { background: var(--purple); color:#fff; border:none; border-radius:6px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-sign-link:hover { background:#6d28d9; }
+.ct-table { width:100%; border-collapse:collapse; font-size:13px; }
+.ct-table th { text-align:left; font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--border); }
+.ct-table td { padding:10px; border-bottom:1px solid rgba(255,255,255,.05); vertical-align:middle; }
+.ct-empty { text-align:center; color:var(--muted); padding:40px 10px; }
+.pill { font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.3px; white-space:nowrap; }
+.pill-att { background:rgba(201,168,76,.15); color:var(--gold); border:1px solid rgba(201,168,76,.3); }
+.pill-sig { background:rgba(5,150,105,.15); color:#34d399; border:1px solid rgba(5,150,105,.35); }
+.mini { font-size:11px; padding:4px 9px; border-radius:5px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; margin-right:4px; }
+.mini:hover { background:#2a2a2a; border-color:var(--muted); }
+
+/* APP */
+#app-screen { display:none; }
+.header { background: var(--dark); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.header-left .title { font-size: 17px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+.header-left .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.header-right { display:flex; align-items:center; gap:10px; }
+.mode-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; letter-spacing: .5px; }
+.mode-admin { background: rgba(201,168,76,.15); color: var(--gold); border: 1px solid rgba(201,168,76,.3); }
+.mode-read { background: rgba(37,99,235,.15); color: #60a5fa; border: 1px solid rgba(37,99,235,.3); }
+.btn-sm { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+.btn-sm:hover { background: #2a2a2a; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display:inline-block; margin-right: 5px; }
+.sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px 24px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.stat-num { font-size: 26px; font-weight: 700; margin-top: 2px; }
+.stat-num.g { color: var(--green); } .stat-num.b { color: var(--blue); } .stat-num.p { color: var(--purple); }
+
+.toolbar { padding: 0 24px 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.toolbar input, .toolbar select { background: var(--input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; padding: 7px 12px; outline: none; }
+.toolbar input { flex:1; min-width:160px; }
+.toolbar input:focus, .toolbar select:focus { border-color: var(--gold); }
+.toolbar select option { background: var(--dark); }
+.btn { font-size: 13px; padding: 7px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; white-space:nowrap; }
+.btn:hover { background: #2a2a2a; }
+.btn-gold { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 600; }
+.btn-gold:hover { background: var(--cream); }
+
+.legend { padding: 0 24px 10px; display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--muted); }
+.dot { width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:3px; }
+.dg{background:var(--green);} .db{background:var(--blue);} .dp{background:var(--purple);}
+
+.table-wrap { padding: 0 24px 24px; overflow-x: auto; }
+table { width:100%; border-collapse:collapse; min-width:900px; }
+th { text-align:left; font-size:11px; font-weight:600; color:var(--muted); letter-spacing:1px; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--border); }
+td { padding:8px 10px; border-bottom:1px solid #1e1e1e; vertical-align:middle; }
+tr:hover td { background:rgba(255,255,255,.02); }
+.col-org{width:18%;} .col-contact{width:13%;} .col-email{width:19%;} .col-type{width:9%;}
+.col-cb{width:5%;text-align:center;} .col-note{width:18%;} .col-del{width:4%;text-align:center;}
+
+.cell-val { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+.cell-val.editable { cursor:pointer; }
+.cell-val.editable:hover { color:var(--gold); }
+.cell-val.empty { color:#444; font-style:italic; font-size:12px; }
+.cell-val.email-val { color:#7ab4f5; font-size:12px; }
+.cell-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--gold); color:var(--text); font-size:13px; padding:1px 0; outline:none; }
+
+.badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+.b-corpo{background:rgba(139,92,246,.15);color:#a78bfa;}
+.b-indus{background:rgba(59,130,246,.15);color:#60a5fa;}
+.b-agri{background:rgba(34,197,94,.15);color:#4ade80;}
+.b-sport{background:rgba(251,146,60,.15);color:#fb923c;}
+.b-golf{background:rgba(20,184,166,.15);color:#2dd4bf;}
+.b-bar{background:rgba(234,179,8,.15);color:#facc15;}
+.b-muni{background:rgba(99,102,241,.15);color:#818cf8;}
+
+input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:var(--gold); }
+input[type=checkbox]:disabled { cursor:default; opacity:.7; }
+
+.del-btn { background:none; border:none; cursor:pointer; color:#444; font-size:18px; padding:2px 4px; border-radius:4px; line-height:1; }
+.del-btn:hover { color:#f87171; background:rgba(248,113,113,.1); }
+
+.add-row td { background:rgba(201,168,76,.04); border-top:1px solid rgba(201,168,76,.2); }
+.add-input { width:100%; background:var(--input); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:12px; padding:4px 7px; outline:none; }
+.add-input:focus { border-color:var(--gold); }
+.add-select { width:100%; background:var(--input); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:12px; padding:4px 7px; outline:none; }
+
+.footer { padding:14px 24px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid var(--border); }
+.footer-msg { flex:1; font-size:12px; color:var(--muted); }
+
+.readonly-banner { background:rgba(37,99,235,.08); border-bottom:1px solid rgba(37,99,235,.2); padding:10px 24px; font-size:13px; color:#60a5fa; text-align:center; }
+
+@media(max-width:600px){ .stats{grid-template-columns:repeat(2,1fr);} }
+
+/* ── MODAL CONTRAT ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:1000; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--dark); border:1px solid var(--border); border-radius:10px; width:100%; max-width:620px; max-height:90vh; overflow-y:auto; padding:28px; }
+.modal h3 { font-size:16px; font-weight:700; color:var(--gold); margin-bottom:18px; letter-spacing:1px; }
+.modal-section { font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:18px 0 10px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.modal-field { display:flex; flex-direction:column; gap:5px; }
+.modal-field label { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:.8px; text-transform:uppercase; }
+.modal-field input, .modal-field select, .modal-field textarea { background:var(--input); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:13px; padding:8px 11px; outline:none; width:100%; }
+.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color:var(--gold); }
+.modal-field textarea { min-height:70px; resize:vertical; }
+.modal-field.full { grid-column:1/-1; }
+.modal-actions { display:flex; gap:10px; margin-top:22px; justify-content:flex-end; flex-wrap:wrap; }
+.btn-modal-close { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:13px; padding:8px 18px; border-radius:6px; cursor:pointer; }
+.btn-modal-close:hover { border-color:var(--text); color:var(--text); }
+.btn-copy-email { background:var(--card); border:1px solid var(--border); color:var(--text); font-size:13px; padding:8px 18px; border-radius:6px; cursor:pointer; }
+.btn-copy-email:hover { background:#2a2a2a; }
+.btn-gen-pdf { background:var(--gold); border:none; color:var(--black); font-size:13px; font-weight:700; padding:8px 22px; border-radius:6px; cursor:pointer; }
+.btn-gen-pdf:hover { background:var(--cream); }
+.contrat-btn { background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.25); color:var(--gold); font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer; white-space:nowrap; }
+.contrat-btn:hover { background:rgba(201,168,76,.22); }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🎸 THAT'S HITS</div>
+    <div class="login-sub">Suivi démarchage 2026</div>
+    <input type="email" id="mail-input" autocomplete="username" placeholder="Courriel admin…" />
+    <input type="password" id="pwd-input" autocomplete="current-password" placeholder="Mot de passe…" />
+    <button class="btn-login" onclick="window.__crm.loginAdmin()">Connexion admin</button>
+    <button class="btn-readonly" onclick="window.__crm.enterReadOnly()">👁 Consulter en lecture seule</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app-screen">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="title">🎸 That's Hits — CRM Démarchage</div>
+      <div class="sub">Gaspésie &amp; Bas-Saint-Laurent</div>
+    </div>
+    <div class="header-right">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span style="font-size:12px;color:var(--muted)" id="sync-label">Connecté</span>
+      <span class="mode-badge" id="mode-badge"></span>
+      <button class="btn-sm" onclick="window.__crm.logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div id="readonly-banner" class="readonly-banner" style="display:none">
+    👁 Mode lecture seule — vous consultez les données en temps réel
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Contacts</div><div class="stat-num" id="s-total">0</div></div>
+    <div class="stat"><div class="stat-label">Envoyés</div><div class="stat-num g" id="s-sent">0</div></div>
+    <div class="stat"><div class="stat-label">Réponses</div><div class="stat-num b" id="s-rep">0</div></div>
+    <div class="stat"><div class="stat-label">Confirmés</div><div class="stat-num p" id="s-rdv">0</div></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="🔍 Rechercher…" />
+    <select id="filter-type">
+      <option value="">Tous les types</option>
+      <option value="corpo">Corporatif</option>
+      <option value="indus">Industrie</option>
+      <option value="agri">Agriculture</option>
+      <option value="sport">Sport</option>
+      <option value="golf">Golf</option>
+      <option value="bar">Bar</option>
+      <option value="muni">Municipal</option>
+      <option value="festival">Festival</option>
+      <option value="orga">Organisme</option>
+      <option value="part">Particulier</option>
+    </select>
+    <select id="filter-status">
+      <option value="">Tous les statuts</option>
+      <option value="none">Pas encore envoyé</option>
+      <option value="sent">Envoyé</option>
+      <option value="rep">Réponse reçue</option>
+      <option value="rdv">Confirmé</option>
+    </select>
+    <button class="btn btn-gold" id="btn-add" onclick="window.__crm.toggleAddRow()">+ Ajouter</button>
+    <button class="btn" onclick="window.__crm.copyResume()">📋 Copier résumé</button>
+    <button class="btn" id="btn-contrats" onclick="window.__crm.ouvrirContrats()">📝 Contrats</button>
+    <button class="btn" id="btn-seed" onclick="window.__crm.forceSeed()" style="display:none">🔄 Recharger contacts</button>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot dg"></span>Envoyé</span>
+    <span><span class="dot db"></span>Réponse</span>
+    <span><span class="dot dp"></span>Confirmé</span>
+    <span id="edit-hint" style="font-style:italic;">Cliquer sur une cellule pour modifier</span>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-org">Organisation</th>
+        <th class="col-contact">Personne contact</th>
+        <th class="col-email">Courriel</th>
+        <th class="col-type">Type</th>
+        <th class="col-cb" title="Envoyé">✓</th>
+        <th class="col-cb" title="Réponse">✉</th>
+        <th class="col-cb" title="Confirmé">★</th>
+        <th class="col-note">Notes</th>
+        <th style="width:7%;text-align:center">Contrat</th>
+      <th class="col-del" id="col-del-header"></th>
+      </tr>
+    </thead>
+    <tbody id="crm-body"></tbody>
+    <tbody id="add-tbody" style="display:none">
+      <tr class="add-row">
+        <td><input class="add-input" id="new-org" placeholder="Organisation…"/></td>
+        <td><input class="add-input" id="new-contact" placeholder="Prénom Nom…"/></td>
+        <td><input class="add-input" id="new-email" placeholder="courriel@…"/></td>
+        <td><select class="add-select" id="new-type">
+          <option value="corpo">Corporatif</option>
+          <option value="indus">Industrie</option>
+          <option value="agri">Agriculture</option>
+          <option value="sport">Sport</option>
+          <option value="golf">Golf</option>
+          <option value="bar">Bar</option>
+          <option value="muni">Municipal</option>
+          <option value="festival">Festival</option>
+          <option value="orga">Organisme</option>
+          <option value="part">Particulier</option>
+        </select></td>
+        <td colspan="4"></td>
+        <td><button class="btn btn-gold" onclick="window.__crm.addRow()" style="padding:4px 10px;font-size:12px">OK</button></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  
+<!-- ══ MODAL CONTRAT ══ -->
+<div class="modal-overlay" id="modal-contrat">
+  <div class="modal">
+    <h3>📄 Générer confirmation & contrat</h3>
+
+    <div class="modal-section">Client</div>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Organisation</label><input id="c-org" type="text" /></div>
+      <div class="modal-field"><label>Personne contact</label><input id="c-contact" type="text" /></div>
+      <div class="modal-field full"><label>Courriel</label><input id="c-email" type="email" /></div>
+    </div>
+
+    <div class="modal-section">Événement</div>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Date</label><input id="c-date" type="date" /></div>
+      <div class="modal-field"><label>Heure de début</label><input id="c-heure" type="time" /></div>
+      <div class="modal-field"><label>Durée</label>
+        <select id="c-duree">
+          <option value="1 heure">1 heure</option>
+          <option value="1h30">1 h 30</option>
+          <option value="2 heures">2 heures</option>
+          <option value="2h30">2 h 30</option>
+          <option value="3 heures" selected>3 heures</option>
+          <option value="3 heures et plus">3 heures et plus</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Nombre de personnes</label><input id="c-nb" type="number" placeholder="ex. 100" /></div>
+      <div class="modal-field full"><label>Lieu / Adresse</label><input id="c-lieu" type="text" /></div>
+    </div>
+
+    <div class="modal-section">Prestation & Tarification</div>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Montant total ($)</label><input id="c-montant" type="number" placeholder="ex. 1200" /></div>
+      <div class="modal-field"><label>Sonorisation</label>
+        <select id="c-sono">
+          <option value="fournie sur place">Fournie sur place</option>
+          <option value="apportée par le groupe">Apportée par le groupe</option>
+          <option value="à déterminer">À déterminer</option>
+        </select>
+      </div>
+      <div class="modal-field full"><label>Inclusions / Particularités</label>
+        <textarea id="c-inclusions" placeholder="ex. Jeux de lumière inclus, frais de déplacement inclus..."></textarea>
+      </div>
+      <div class="modal-field full"><label>Notes / Frais supplémentaires</label>
+        <textarea id="c-notes" placeholder="ex. Hébergement inclus, frais km à rembourser..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-close" onclick="window.__crm.closeContrat()">Annuler</button>
+      <button class="btn-copy-email" onclick="window.__crm.copyEmailContrat()">📋 Copier courriel</button>
+      <button class="btn-gen-pdf" onclick="window.__crm.genererPDF()">⬇ Télécharger PDF</button>
+      <button class="btn-sign-link" onclick="window.__crm.creerLienSignature()">🔗 Créer le lien de signature</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-liste">
+  <div class="modal">
+    <h3>📝 Contrats envoyés pour signature</h3>
+    <div style="max-height:60vh;overflow:auto;margin-top:14px">
+      <table class="ct-table">
+        <thead><tr><th>Client</th><th>Date</th><th>Montant</th><th>Statut</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="ct-body"></tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-close" onclick="window.__crm.fermerContrats()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+    <div class="footer-msg" id="footer-msg">Données synchronisées en temps réel avec Firebase.</div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB1kpeDjxx7HnMX_amrGUNiXHEiS0KhyzA",
+  authDomain: "thats-hits.firebaseapp.com",
+  databaseURL: "https://thats-hits-default-rtdb.firebaseio.com",
+  projectId: "thats-hits",
+  storageBucket: "thats-hits.firebasestorage.app",
+  messagingSenderId: "26811508803",
+  appId: "1:26811508803:web:c6ffd159134a28f36c4cf6"
+};
+
+// Identifiant du compte admin, créé dans la console Firebase.
+// Ce n'est PAS un secret : c'est un identifiant public que les règles
+// Firestore comparent au jeton signé par Firebase. Le mot de passe,
+// lui, ne se trouve plus nulle part dans ce fichier.
+// Laisse la valeur vide au premier lancement : le CRM affichera ton UID
+// après la connexion, tu n'auras qu'à le recopier ici.
+const ADMIN_UID = "VIkDuRyGgBdJj0SNjHAWtumdeP62";
+
+const TYPES = { corpo:'Corporatif', indus:'Industrie', agri:'Agriculture', sport:'Sport', golf:'Golf', bar:'Bar', muni:'Municipal', festival:'Festival', orga:'Organisme', part:'Particulier' };
+const BADGE = { corpo:'b-corpo', indus:'b-indus', agri:'b-agri', sport:'b-sport', golf:'b-golf', bar:'b-bar', muni:'b-muni', festival:'b-sport', orga:'b-muni', part:'b-golf' };
+
+const DEFAULTS = [
+  { id:'1',  org:'MRC de La Matapédia',              contact:'',               email:'administration@mrcmatapedia.quebec', type:'muni',    sent:false, rep:false, rdv:false, note:'' },
+  { id:'2',  org:'Uniboard Sayabec',                 contact:'',               email:'pr@uniboard.com',                   type:'indus',   sent:false, rep:false, rdv:false, note:'400 employés à Sayabec' },
+  { id:'3',  org:'Groupe RPF',                       contact:'',               email:'info@grouperpf.com',                type:'indus',   sent:false, rep:false, rdv:false, note:'Siège Sayabec, plusieurs filiales' },
+  { id:'4',  org:'Natrel / Agropur Amqui',           contact:'Éric Larrivée', email:'',                                  type:'indus',   sent:false, rep:false, rdv:false, note:'Directeur usine' },
+  { id:'5',  org:'Coop Purdel',                      contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'~380 emp., Amqui/Causapscal' },
+  { id:'6',  org:'Coop forestière Matapédia',        contact:'',               email:'',                                  type:'agri',    sent:false, rep:false, rdv:false, note:'Causapscal, 79 travailleurs' },
+  { id:'7',  org:'André Hallé et fils',              contact:'',               email:'andrehalleetfils@andrehalle.com',   type:'corpo',   sent:false, rep:false, rdv:false, note:'BRP, ~40 emp., Amqui/Matane/Rimouski' },
+  { id:'8',  org:'Lee Conciergerie',                 contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'leeconciergerie.com, Amqui' },
+  { id:'9',  org:'Club de golf Revermont',           contact:'',               email:'club.revermont@cgocable.ca',        type:'golf',    sent:false, rep:false, rdv:false, note:'Salle réception sur place' },
+  { id:'10', org:'Omnium Yves-Lévesque',             contact:'',               email:'omniumyl@gmail.com',               type:'sport',   sent:false, rep:false, rdv:false, note:'Volleyball, tournoi annuel Amqui' },
+  { id:'11', org:'Société agriculture Matapédia',    contact:'',               email:'expodelamatapedia@hotmail.com',    type:'agri',    sent:false, rep:false, rdv:false, note:'Expo agricole juin, Amqui' },
+  { id:'12', org:"Ville d'Amqui",                    contact:'',               email:'',                                  type:'muni',    sent:false, rep:false, rdv:false, note:'ville.amqui.qc.ca' },
+  { id:'13', org:'MRC de La Mitis',                  contact:'',               email:'mrcmitis@mitis.qc.ca',              type:'muni',    sent:false, rep:false, rdv:false, note:'Mont-Joli' },
+  { id:'14', org:'CISSS BSL',                        contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'Mont-Joli et Amqui' },
+  { id:'15', org:'Oktobière de Gaspé',               contact:'Gabrielle Dunn', email:'',                                 type:'festival',sent:false, rep:false, rdv:false, note:'Via Jonathan Desjardins / La Boîte Flexible' },
+  { id:'16', org:'Microbrasserie La Captive',        contact:'',               email:'info@lacaptive.ca',                type:'bar',     sent:false, rep:false, rdv:false, note:'Amqui, salle spectacle 2e étage' },
+  { id:'17', org:'Bar Laser',                        contact:'',               email:'',                                  type:'bar',     sent:false, rep:false, rdv:false, note:'Causapscal, 418-756-5011' },
+  { id:'19', org:'Boston Pizza Canada',            contact:'',               email:'info@bostonpizza.com',              type:'corpo', sent:false, rep:false, rdv:false, note:'Tournée des étoiles montantes — musique live terrasses été. events.bostonpizza.com' },
+  { id:'18', org:'Microbrasserie Le Ketch',          contact:'Guillaume Desmeules', email:'desmeules@leketch.com',        type:'bar',     sent:false, rep:false, rdv:false, note:'Gestionnaire | 581 246-0100' },
+];
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const colRef = collection(db, 'contacts');
+const contratsRef = collection(db, 'contrats');
+
+// Adresse publique de la page de signature.
+const SIGN_URL = 'https://croustia.github.io/thats-hits-crm/signature.html';
+
+let data = [];
+let isAdmin = false;
+let unsubscribe = null;
+let contrats = [];
+let unsubContrats = null;
+let contratContactId = null;
+let lienActuel = null;
+
+
+// ── CONTRAT ──
+function openContrat(id) {
+  const r = data.find(r => r.id === id);
+  if (!r) return;
+  contratContactId = r.id;
+  lienActuel = null;
+  document.getElementById('c-org').value = r.org || '';
+  document.getElementById('c-contact').value = r.contact || '';
+  document.getElementById('c-email').value = r.email || '';
+  document.getElementById('c-date').value = '';
+  document.getElementById('c-heure').value = '';
+  document.getElementById('c-nb').value = '';
+  document.getElementById('c-lieu').value = r.note || '';
+  document.getElementById('c-montant').value = '';
+  document.getElementById('c-inclusions').value = '';
+  document.getElementById('c-notes').value = '';
+  document.getElementById('modal-contrat').classList.add('open');
+}
+
+function closeContrat() {
+  document.getElementById('modal-contrat').classList.remove('open');
+}
+
+function getContratData() {
+  const dateRaw = document.getElementById('c-date').value;
+  let dateFormatted = '';
+  if (dateRaw) {
+    const [y, m, d] = dateRaw.split('-');
+    const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    dateFormatted = `${parseInt(d)} ${mois[parseInt(m)-1]} ${y}`;
+  }
+  return {
+    org: document.getElementById('c-org').value,
+    contact: document.getElementById('c-contact').value,
+    email: document.getElementById('c-email').value,
+    date: dateFormatted,
+    heure: document.getElementById('c-heure').value,
+    duree: document.getElementById('c-duree').value,
+    nb: document.getElementById('c-nb').value,
+    lieu: document.getElementById('c-lieu').value,
+    montant: document.getElementById('c-montant').value,
+    sono: document.getElementById('c-sono').value,
+    inclusions: document.getElementById('c-inclusions').value,
+    notes: document.getElementById('c-notes').value,
+  };
+}
+
+// ── LIEN DE SIGNATURE ──
+
+// Jeton imprévisible : c'est lui qui protège l'accès au contrat.
+function nouveauJeton() {
+  const b = new Uint8Array(16);
+  crypto.getRandomValues(b);
+  return [...b].map(x => x.toString(36).padStart(2, '0')).join('').slice(0, 24);
+}
+
+// Crée le contrat dans Firestore et renvoie son lien.
+// Réutilise le lien déjà créé pour ce contrat (pas de doublon si on
+// clique « courriel » puis « lien », ou plusieurs fois).
+async function obtenirLien() {
+  if (lienActuel) return lienActuel;
+  const d = getContratData();
+  if (!d.org || !d.date || !d.montant) {
+    flashMsg('Organisation, date et montant sont requis.', 'var(--red)');
+    return null;
+  }
+  const jeton = nouveauJeton();
+  await setDoc(doc(db, 'contrats', jeton), {
+    id: jeton,
+    contactId: contratContactId,
+    org: d.org, contact: d.contact, email: d.email,
+    date: d.date, heure: d.heure, duree: d.duree, nb: d.nb,
+    lieu: d.lieu, montant: d.montant, sono: d.sono,
+    inclusions: d.inclusions, notes: d.notes,
+    status: 'attente',
+    createdAt: new Date().toISOString(),
+    signataire: '', signataireTitre: '', signatureImg: '',
+    signedAt: null, signedUA: '', contratHash: ''
+  });
+  lienActuel = SIGN_URL + '?c=' + jeton;
+  return lienActuel;
+}
+
+async function creerLienSignature() {
+  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
+  try {
+    const lien = await obtenirLien();
+    if (!lien) return;
+    await navigator.clipboard.writeText(lien);
+    closeContrat();
+    flashMsg('✓ Lien de signature copié — collez-le dans le courriel au client.');
+  } catch (e) {
+    console.error(e);
+    flashMsg('Création du lien impossible. Vérifiez la connexion.', 'var(--red)');
+  }
+}
+
+
+function ouvrirContrats() {
+  document.getElementById('modal-liste').classList.add('open');
+  renderContrats();
+}
+
+function fermerContrats() {
+  document.getElementById('modal-liste').classList.remove('open');
+}
+
+function renderContrats() {
+  const body = document.getElementById('ct-body');
+  if (!contrats.length) {
+    body.innerHTML = '<tr><td colspan="5" class="ct-empty">Aucun contrat envoyé pour l\'instant.<br>Ouvrez un contact, remplissez le contrat, puis « Créer le lien de signature ».</td></tr>';
+    return;
+  }
+  const tri = [...contrats].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  body.innerHTML = tri.map(c => {
+    const signe = c.status === 'signe';
+    const quand = signe && c.signedAt ? new Date(c.signedAt).toLocaleDateString('fr-CA') : '';
+    return `<tr>
+      <td style="font-weight:600">${esc(c.org)}<div style="color:var(--muted);font-weight:400;font-size:11px">${esc(c.contact || '')}</div></td>
+      <td>${esc(c.date || '—')}</td>
+      <td>${esc(c.montant || '—')} $</td>
+      <td><span class="pill ${signe ? 'pill-sig' : 'pill-att'}">${signe ? '✓ Signé ' + quand : '⏳ En attente'}</span></td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="mini" onclick="window.__crm.copierLien('${c.id}')">🔗 Lien</button>
+        <button class="mini" onclick="window.__crm.voirContrat('${c.id}')">👁 Voir</button>
+        ${isAdmin ? `<button class="mini" onclick="window.__crm.supprimerContrat('${c.id}')" style="color:var(--red)">×</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function copierLien(id) {
+  navigator.clipboard.writeText(SIGN_URL + '?c=' + id)
+    .then(() => flashMsg('✓ Lien copié.'));
+}
+
+function voirContrat(id) {
+  window.open(SIGN_URL + '?c=' + id, '_blank');
+}
+
+async function supprimerContrat(id) {
+  const c = contrats.find(x => x.id === id);
+  if (!isAdmin || !c) return;
+  const avert = c.status === 'signe'
+    ? `Ce contrat est SIGNÉ par ${c.signataire}. Le supprimer efface la preuve de signature. Continuer ?`
+    : `Supprimer le contrat de ${c.org} ? Le lien envoyé au client cessera de fonctionner.`;
+  if (!confirm(avert)) return;
+  await deleteDoc(doc(db, 'contrats', id));
+  flashMsg('Contrat supprimé.');
+}
+
+function ecouterContrats() {
+  if (unsubContrats) unsubContrats();
+  unsubContrats = onSnapshot(contratsRef, snap => {
+    contrats = snap.docs.map(d => d.data());
+    const enAttente = contrats.filter(c => c.status !== 'signe').length;
+    const signes = contrats.filter(c => c.status === 'signe').length;
+    const btn = document.getElementById('btn-contrats');
+    if (btn) btn.textContent = signes ? `📝 Contrats (${signes} signé${signes > 1 ? 's' : ''})` : `📝 Contrats${enAttente ? ' (' + enAttente + ')' : ''}`;
+    if (document.getElementById('modal-liste').classList.contains('open')) renderContrats();
+  }, err => console.error('contrats:', err));
+}
+
+async function copyEmailContrat() {
+  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
+  const d = getContratData();
+  const lien = await obtenirLien();
+  if (!lien) return;
+  const email = `Bonjour ${d.contact || d.org},
+
+Suite à votre demande, nous avons le plaisir de confirmer la réservation de That's Hits pour votre événement.
+
+VÉRIFIER ET CONFIRMER VOTRE RÉSERVATION
+Pour confirmer, il vous suffit de vérifier les détails et de signer en ligne — c'est rapide et sécurisé :
+${lien}
+
+Pour les détails à venir, nous vous contacterons par téléphone.
+
+Nous vous remercions de votre confiance et avons hâte de faire de votre événement une soirée mémorable !
+
+Cordialement,
+Christian
+Représentant — That's Hits
+thats.hits.music@gmail.com
+https://thats-hits.tiiny.site`;
+
+  try {
+    await navigator.clipboard.writeText(email);
+    closeContrat();
+    flashMsg('✓ Courriel + lien de signature copiés — collez dans Gmail.');
+  } catch (e) {
+    console.error(e);
+    flashMsg('Copie impossible. Le contrat est enregistré ; réessayez.', 'var(--red)');
+  }
+}
+
+function genererPDF() {
+  const d = getContratData();
+  const inclusions = d.inclusions ? `<p><strong>Inclusions :</strong><br>${d.inclusions.replace(/\n/g,'<br>')}</p>` : '';
+  const notes = d.notes ? `<p><strong>Notes / Frais supplémentaires :</strong><br>${d.notes.replace(/\n/g,'<br>')}</p>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Contrat That's Hits — ${d.org}</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 720px; margin: 0 auto; padding: 40px 32px; color: #111; font-size: 14px; line-height: 1.7; }
+  .header { text-align: center; border-bottom: 2px solid #C9A84C; padding-bottom: 20px; margin-bottom: 28px; }
+  .logo-text { font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #C9A84C; }
+  .sub { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+  .doc-title { font-size: 18px; font-weight: 700; text-align: center; margin: 24px 0 28px; text-transform: uppercase; letter-spacing: 2px; color: #333; }
+  .section { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #C9A84C; border-bottom: 1px solid #eee; padding-bottom: 5px; margin: 24px 0 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+  .row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .row-label { font-weight: 700; min-width: 160px; color: #555; font-size: 13px; }
+  .row-val { color: #111; font-size: 13px; }
+  .montant-box { background: #f9f5ec; border: 2px solid #C9A84C; border-radius: 6px; padding: 16px 20px; margin: 20px 0; text-align: center; }
+  .montant-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+  .montant-val { font-size: 32px; font-weight: 700; color: #C9A84C; }
+  .paiement { font-size: 13px; color: #555; margin-top: 6px; }
+  .policy { background: #fafafa; border-left: 3px solid #C9A84C; padding: 12px 16px; font-size: 13px; color: #555; margin: 20px 0; }
+  .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
+  .sig-block { border-top: 1px solid #333; padding-top: 10px; font-size: 12px; color: #666; }
+  .sig-name { font-weight: 700; color: #333; font-size: 13px; }
+  .footer-doc { text-align: center; font-size: 11px; color: #aaa; margin-top: 40px; padding-top: 16px; border-top: 1px solid #eee; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-text">THAT'S HITS</div>
+  <div class="sub">Groupe de rock — Gaspésie & Bas-Saint-Laurent</div>
+</div>
+
+<div class="doc-title">Confirmation de réservation</div>
+
+<div class="section">Informations client</div>
+<div class="row"><span class="row-label">Organisation :</span><span class="row-val">${d.org}</span></div>
+<div class="row"><span class="row-label">Personne contact :</span><span class="row-val">${d.contact}</span></div>
+<div class="row"><span class="row-label">Courriel :</span><span class="row-val">${d.email}</span></div>
+
+<div class="section">Détails de l'événement</div>
+<div class="row"><span class="row-label">Date :</span><span class="row-val">${d.date}</span></div>
+<div class="row"><span class="row-label">Heure de début :</span><span class="row-val">${d.heure}</span></div>
+<div class="row"><span class="row-label">Durée :</span><span class="row-val">${d.duree}</span></div>
+<div class="row"><span class="row-label">Nombre de personnes :</span><span class="row-val">${d.nb}</span></div>
+<div class="row"><span class="row-label">Lieu :</span><span class="row-val">${d.lieu}</span></div>
+<div class="row"><span class="row-label">Sonorisation :</span><span class="row-val">${d.sono}</span></div>
+
+<div class="section">Tarification</div>
+<div class="montant-box">
+  <div class="montant-label">Montant total</div>
+  <div class="montant-val">${d.montant} $</div>
+  <div class="paiement">Paiement accepté : Virement Interac · Chèque · Argent comptant</div>
+</div>
+${inclusions}
+${notes}
+
+<div class="section">Politique d'annulation</div>
+<div class="policy">
+  Toute annulation effectuée moins de <strong>30 jours</strong> avant la date de l'événement entraîne des frais équivalant à <strong>50 % du montant total</strong> convenu.
+</div>
+
+<div class="section">Signatures</div>
+<div class="signatures">
+  <div class="sig-block">
+    <div class="sig-name">That's Hits</div>
+    Christian — Représentant<br>
+    thats.hits.music@gmail.com<br><br>
+    Signature : ___________________<br>
+    Date : ___________________
+  </div>
+  <div class="sig-block">
+    <div class="sig-name">${d.org}</div>
+    ${d.contact}<br><br><br>
+    Signature : ___________________<br>
+    Date : ___________________
+  </div>
+</div>
+
+<div class="footer-doc">
+  That's Hits · thats.hits.music@gmail.com · https://thats-hits.tiiny.site<br>
+  Document généré le ${new Date().toLocaleDateString('fr-CA')}
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.onload = () => { win.print(); };
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  closeContrat();
+}
+
+// ── EXPOSE FUNCTIONS TO WINDOW ──
+window.__crm = { loginAdmin, enterReadOnly, logout, toggleAddRow, addRow, copyResume, editCell, toggle, del, openContrat, closeContrat, copyEmailContrat, genererPDF, forceSeed,
+  creerLienSignature, ouvrirContrats, fermerContrats, copierLien, voirContrat, supprimerContrat };
+
+function setSyncing(yes) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot' + (yes ? ' syncing' : '');
+  lbl.textContent = yes ? 'Synchronisation…' : 'Connecté';
+}
+
+async function seedIfEmpty() {
+  try {
+    const snap = await getDocs(colRef);
+    if (snap.empty && isAdmin) {
+      setSyncing(true);
+      for (const row of DEFAULTS) {
+        await setDoc(doc(db, 'contacts', row.id), row);
+      }
+      setSyncing(false);
+      flashMsg('✓ ' + DEFAULTS.length + ' contacts chargés dans Firebase !');
+    }
+  } catch(e) {
+    console.error('Firestore error:', e);
+    // Fallback: utiliser les données locales
+    data = JSON.parse(JSON.stringify(DEFAULTS));
+    render();
+    document.getElementById('sync-label').textContent = 'Mode hors ligne';
+    document.getElementById('sync-dot').style.background = '#f59e0b';
+    flashMsg('⚠ Firebase inaccessible — données locales utilisées.');
+  }
+}
+
+async function forceSeed() {
+  if (!confirm('Recharger tous les contacts par défaut ? Les données existantes seront conservées.')) return;
+  setSyncing(true);
+  for (const row of DEFAULTS) {
+    await setDoc(doc(db, 'contacts', row.id), row);
+  }
+  setSyncing(false);
+  flashMsg('✓ ' + DEFAULTS.length + ' contacts rechargés !');
+}
+window.__crm.forceSeed = forceSeed;
+
+function startListening() {
+  if (unsubscribe) unsubscribe();
+  unsubscribe = onSnapshot(colRef, snap => {
+    data = snap.docs.map(d => d.data());
+    data.sort((a,b) => Number(a.id) - Number(b.id));
+    render();
+  });
+}
+
+const ERREURS_AUTH = {
+  'auth/invalid-email': "Ce courriel n'est pas valide.",
+  'auth/invalid-credential': 'Courriel ou mot de passe incorrect.',
+  'auth/wrong-password': 'Courriel ou mot de passe incorrect.',
+  'auth/user-not-found': 'Courriel ou mot de passe incorrect.',
+  'auth/too-many-requests': 'Trop de tentatives. Réessaie dans quelques minutes.',
+  'auth/network-request-failed': 'Connexion impossible. Vérifie ton accès Internet.',
+  'auth/operation-not-allowed': "Le mode de connexion n'est pas activé dans la console Firebase."
+};
+
+function erreurAuth(e) {
+  return ERREURS_AUTH[e && e.code] || "La connexion a échoué. Réessaie.";
+}
+
+async function loginAdmin() {
+  const mail = document.getElementById('mail-input').value.trim();
+  const pwd = document.getElementById('pwd-input').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  if (!mail || !pwd) { err.textContent = 'Entre ton courriel et ton mot de passe.'; return; }
+  try {
+    // Firebase vérifie le mot de passe sur ses serveurs et renvoie un
+    // jeton signé. onAuthStateChanged prend le relais et ouvre le CRM.
+    await signInWithEmailAndPassword(auth, mail, pwd);
+  } catch (e) {
+    err.textContent = erreurAuth(e);
+  }
+}
+
+async function enterReadOnly() {
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  try {
+    // Session anonyme : les musiciens consultent sans compte, mais les
+    // règles Firestore leur refusent toute écriture.
+    await signInAnonymously(auth);
+  } catch (e) {
+    err.textContent = erreurAuth(e);
+  }
+}
+
+// Point d'entrée unique : la session survit aux rechargements de page.
+onAuthStateChanged(auth, async user => {
+  if (!user) { afficherConnexion(); return; }
+  isAdmin = !user.isAnonymous;
+  await showApp();
+  if (isAdmin && !ADMIN_UID) {
+    console.log('UID admin à recopier dans ADMIN_UID :', user.uid);
+    alert("Configuration à terminer.\n\nRecopie cet UID dans la constante ADMIN_UID de index.html, puis republie la page :\n\n" + user.uid);
+  }
+});
+
+function afficherConnexion() {
+  isAdmin = false;
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  if (unsubContrats) { unsubContrats(); unsubContrats = null; }
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('login-err').textContent = '';
+}
+
+async function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('mode-badge').textContent = isAdmin ? '⚙ Admin' : '👁 Lecture seule';
+  document.getElementById('mode-badge').className = 'mode-badge ' + (isAdmin ? 'mode-admin' : 'mode-read');
+  document.getElementById('readonly-banner').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('btn-add').style.display = isAdmin ? '' : 'none';
+  document.getElementById('btn-seed').style.display = isAdmin ? '' : 'none';
+  document.getElementById('edit-hint').style.display = isAdmin ? '' : 'none';
+  await seedIfEmpty();
+  startListening();
+  ecouterContrats();
+}
+
+async function logout() {
+  await signOut(auth);   // onAuthStateChanged ramène l'écran de connexion
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getFiltered() {
+  const s = document.getElementById('search').value.toLowerCase();
+  const ft = document.getElementById('filter-type').value;
+  const fs = document.getElementById('filter-status').value;
+  return data.filter(r => {
+    if (s && ![r.org,r.contact,r.email,r.note].some(f=>(f||'').toLowerCase().includes(s))) return false;
+    if (ft && r.type !== ft) return false;
+    if (fs==='sent' && !r.sent) return false;
+    if (fs==='rep' && !r.rep) return false;
+    if (fs==='rdv' && !r.rdv) return false;
+    if (fs==='none' && r.sent) return false;
+    return true;
+  });
+}
+
+function render() {
+  const filtered = getFiltered();
+  const editable = isAdmin;
+  document.getElementById('crm-body').innerHTML = filtered.map(r => `
+    <tr data-id="${esc(r.id)}">
+      <td class="col-org"><span class="cell-val ${editable?'editable':''}" style="font-weight:600" ${editable?`onclick="window.__crm.editCell('${r.id}','org',this)"`:''}>${esc(r.org)}</span></td>
+      <td class="col-contact"><span class="cell-val ${r.contact?'':'empty'} ${editable?'editable':''}" ${editable?`onclick="window.__crm.editCell('${r.id}','contact',this)"`:''}>${r.contact?esc(r.contact):(editable?'— ajouter —':'—')}</span></td>
+      <td class="col-email"><span class="cell-val ${r.email?'email-val':'empty'} ${editable?'editable':''}" ${editable?`onclick="window.__crm.editCell('${r.id}','email',this)"`:''}>${r.email?esc(r.email):(editable?'— ajouter —':'—')}</span></td>
+      <td class="col-type"><span class="badge ${BADGE[r.type]||'b-corpo'}">${TYPES[r.type]||r.type}</span></td>
+      <td class="col-cb"><input type="checkbox" ${r.sent?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','sent',this.checked)"`:' disabled'} /></td>
+      <td class="col-cb"><input type="checkbox" ${r.rep?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','rep',this.checked)"`:' disabled'} /></td>
+      <td class="col-cb"><input type="checkbox" ${r.rdv?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','rdv',this.checked)"`:' disabled'} /></td>
+      <td class="col-note"><span class="cell-val ${r.note?'':'empty'} ${editable?'editable':''}" style="color:#aaa" ${editable?`onclick="window.__crm.editCell('${r.id}','note',this)"`:''}>${r.note?esc(r.note):'—'}</span></td>
+      <td style="text-align:center"><button class="contrat-btn" onclick="window.__crm.openContrat('${r.id}')">📄 Contrat</button></td>
+      <td class="col-del">${editable?`<button class="del-btn" onclick="window.__crm.del('${r.id}')" title="Supprimer">×</button>`:''}</td>
+    </tr>
+  `).join('');
+  updateStats();
+}
+
+async function editCell(id, field, el) {
+  if (!isAdmin) return;
+  const r = data.find(r=>r.id===id);
+  if (!r) return;
+  const inp = document.createElement('input');
+  inp.className = 'cell-input';
+  inp.value = r[field]||'';
+  inp.placeholder = field==='contact'?'Prénom Nom…':field==='email'?'courriel@…':field==='org'?'Organisation…':'Notes…';
+  el.replaceWith(inp);
+  inp.focus(); inp.select();
+  const commit = async () => {
+    const val = inp.value.trim();
+    if (val !== (r[field]||'')) {
+      setSyncing(true);
+      await updateDoc(doc(db,'contacts',id), {[field]: val});
+      setSyncing(false);
+    }
+  };
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') inp.blur(); if(e.key==='Escape'){inp.value=r[field]||''; inp.blur();} });
+}
+
+async function toggle(id, field, val) {
+  if (!isAdmin) return;
+  setSyncing(true);
+  await updateDoc(doc(db,'contacts',id), {[field]: val});
+  setSyncing(false);
+}
+
+async function del(id) {
+  if (!isAdmin) return;
+  if (!confirm('Supprimer ce contact ?')) return;
+  setSyncing(true);
+  await deleteDoc(doc(db,'contacts',id));
+  setSyncing(false);
+}
+
+function toggleAddRow() {
+  if (!isAdmin) return;
+  const b = document.getElementById('add-tbody');
+  b.style.display = b.style.display==='none' ? '' : 'none';
+  if (b.style.display!=='none') document.getElementById('new-org').focus();
+}
+
+async function addRow() {
+  if (!isAdmin) return;
+  const org = document.getElementById('new-org').value.trim();
+  if (!org) { document.getElementById('new-org').focus(); return; }
+  const id = Date.now().toString();
+  const newRow = { id, org, contact:document.getElementById('new-contact').value.trim(), email:document.getElementById('new-email').value.trim(), type:document.getElementById('new-type').value, sent:false, rep:false, rdv:false, note:'' };
+  setSyncing(true);
+  await setDoc(doc(db,'contacts',id), newRow);
+  setSyncing(false);
+  ['new-org','new-contact','new-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-tbody').style.display='none';
+}
+
+function flashMsg(msg, color) {
+  const el = document.getElementById('footer-msg');
+  el.style.color = color || '#4ade80';
+  el.textContent = msg;
+  setTimeout(()=>{ el.style.color=''; el.textContent='Données synchronisées en temps réel avec Firebase.'; }, 4000);
+}
+
+function updateStats() {
+  document.getElementById('s-total').textContent = data.length;
+  document.getElementById('s-sent').textContent = data.filter(r=>r.sent).length;
+  document.getElementById('s-rep').textContent = data.filter(r=>r.rep).length;
+  document.getElementById('s-rdv').textContent = data.filter(r=>r.rdv).length;
+}
+
+function copyResume() {
+  const lines = ["🎸 That's Hits — Suivi démarchage", `Date: ${new Date().toLocaleDateString('fr-CA')}`, '', `Contacts: ${data.length}  |  Envoyés: ${data.filter(r=>r.sent).length}  |  Réponses: ${data.filter(r=>r.rep).length}  |  Confirmés: ${data.filter(r=>r.rdv).length}`];
+  const rdv = data.filter(r=>r.rdv);
+  const rep = data.filter(r=>r.rep&&!r.rdv);
+  const pending = data.filter(r=>!r.sent);
+  if (rdv.length) { lines.push('','✅ Confirmés:'); rdv.forEach(r=>lines.push(`  • ${r.org}${r.contact?' ('+r.contact+')':''}${r.note?' — '+r.note:''}`)); }
+  if (rep.length) { lines.push('','💬 Réponses reçues:'); rep.forEach(r=>lines.push(`  • ${r.org}${r.contact?' ('+r.contact+')':''}${r.note?' — '+r.note:''}`)); }
+  if (pending.length) { lines.push('','⏳ Pas encore contactés:'); pending.forEach(r=>lines.push(`  • ${r.org}`)); }
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const el = document.getElementById('footer-msg');
+    el.style.color='#4ade80';
+    el.textContent='✓ Résumé copié — colle dans un message au groupe !';
+    setTimeout(()=>{ el.style.color=''; el.textContent='Données synchronisées en temps réel avec Firebase.'; }, 3000);
+  });
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('filter-type').addEventListener('change', render);
+document.getElementById('filter-status').addEventListener('change', render);
+document.getElementById('new-org').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('new-contact').focus(); });
+document.getElementById('new-contact').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('new-email').focus(); });
+document.getElementById('new-email').addEventListener('keydown', e=>{ if(e.key==='Enter') addRow(); });
+document.getElementById('pwd-input').addEventListener('keydown', e=>{ if(e.key==='Enter') loginAdmin(); });
+document.getElementById('mail-input').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('pwd-input').focus(); });
+</script>
+</body>
+</html>
