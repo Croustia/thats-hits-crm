@@ -1,1336 +1,908 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr-CA">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>That's Hits — CRM</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B8A2B" id="meta-couleur">
+<title>Korum</title>
+<link rel="icon" href="data:," id="favicon">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --black: #0a0a0a; --dark: #111; --card: #1a1a1a; --border: #2a2a2a;
-  --gold: #C9A84C; --cream: #F0DFA0; --text: #f0f0f0; --muted: #888;
-  --input: #141414; --green: #059669; --blue: #2563EB; --purple: #7C3AED;
-  --red: #dc2626;
+:root{
+  --accent:#0B8A2B; --accent-fonce:color-mix(in srgb,var(--accent) 78%,#000); --accent-pale:color-mix(in srgb,var(--accent) 10%,#fff); --accent-bord:color-mix(in srgb,var(--accent) 25%,#fff);
+  --texte:#0f1923; --gris:#4a5568; --gris-pale:#6b7a8c;
+  --ligne:rgba(27,45,66,.12); --ligne-champ:rgba(27,45,66,.22); --fond:#f5f5f0; --blanc:#ffffff;
+  --focus:color-mix(in srgb,var(--accent) 35%,transparent);
+  --titre:"DM Serif Display",Georgia,serif;
+  --rouge:#b3261e; --rouge-pale:#fbe9e7;
+  --r:10px;
 }
-body { background: var(--black); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
-
-/* LOGIN */
-#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
-.login-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px 36px; width: 100%; max-width: 380px; text-align:center; }
-.login-logo { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 6px; }
-.login-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-.login-box input { width:100%; background: var(--input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; padding: 11px 14px; outline: none; margin-bottom: 12px; }
-.login-box input:focus { border-color: var(--gold); }
-.btn-login { width:100%; background: var(--gold); color: var(--black); font-size: 14px; font-weight: 700; border: none; border-radius: 6px; padding: 12px; cursor: pointer; letter-spacing: 1px; margin-bottom: 12px; }
-.btn-login:hover { background: var(--cream); }
-.btn-readonly { width:100%; background: transparent; color: var(--muted); font-size: 13px; border: 1px solid var(--border); border-radius: 6px; padding: 10px; cursor: pointer; }
-.btn-readonly:hover { border-color: var(--muted); color: var(--text); }
-.login-err { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 18px; }
-
-.btn-sign-link { background: var(--purple); color:#fff; border:none; border-radius:6px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
-.btn-sign-link:hover { background:#6d28d9; }
-.ct-table { width:100%; border-collapse:collapse; font-size:13px; }
-.ct-table th { text-align:left; font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--border); }
-.ct-table td { padding:10px; border-bottom:1px solid rgba(255,255,255,.05); vertical-align:middle; }
-.ct-empty { text-align:center; color:var(--muted); padding:40px 10px; }
-.pill { font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.3px; white-space:nowrap; }
-.pill-att { background:rgba(201,168,76,.15); color:var(--gold); border:1px solid rgba(201,168,76,.3); }
-.pill-sig { background:rgba(5,150,105,.15); color:#34d399; border:1px solid rgba(5,150,105,.35); }
-.mini { font-size:11px; padding:4px 9px; border-radius:5px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; margin-right:4px; }
-.mini:hover { background:#2a2a2a; border-color:var(--muted); }
-
-/* APP */
-#app-screen { display:none; }
-.header { background: var(--dark); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-.header-left .title { font-size: 17px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
-.header-left .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.header-right { display:flex; align-items:center; gap:10px; }
-.mode-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; letter-spacing: .5px; }
-.mode-admin { background: rgba(201,168,76,.15); color: var(--gold); border: 1px solid rgba(201,168,76,.3); }
-.mode-read { background: rgba(37,99,235,.15); color: #60a5fa; border: 1px solid rgba(37,99,235,.3); }
-.btn-sm { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
-.btn-sm:hover { background: #2a2a2a; }
-.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display:inline-block; margin-right: 5px; }
-.sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px 24px; }
-.stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
-.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.stat-num { font-size: 26px; font-weight: 700; margin-top: 2px; }
-.stat-num.g { color: var(--green); } .stat-num.b { color: var(--blue); } .stat-num.p { color: var(--purple); }
-
-.toolbar { padding: 0 24px 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.toolbar input, .toolbar select { background: var(--input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; padding: 7px 12px; outline: none; }
-.toolbar input { flex:1; min-width:160px; }
-.toolbar input:focus, .toolbar select:focus { border-color: var(--gold); }
-.toolbar select option { background: var(--dark); }
-.btn { font-size: 13px; padding: 7px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; white-space:nowrap; }
-.btn:hover { background: #2a2a2a; }
-.btn-gold { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 600; }
-.btn-gold:hover { background: var(--cream); }
-
-.legend { padding: 0 24px 10px; display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--muted); }
-.dot { width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:3px; }
-.dg{background:var(--green);} .db{background:var(--blue);} .dp{background:var(--purple);}
-
-.table-wrap { padding: 0 24px 24px; overflow-x: auto; }
-table { width:100%; border-collapse:collapse; min-width:900px; }
-th { text-align:left; font-size:11px; font-weight:600; color:var(--muted); letter-spacing:1px; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--border); }
-td { padding:8px 10px; border-bottom:1px solid #1e1e1e; vertical-align:middle; }
-tr:hover td { background:rgba(255,255,255,.02); }
-.col-org{width:18%;} .col-contact{width:13%;} .col-email{width:19%;} .col-type{width:9%;}
-.col-cb{width:5%;text-align:center;} .col-note{width:18%;} .col-del{width:4%;text-align:center;}
-
-.cell-val { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
-.cell-val.editable { cursor:pointer; }
-.cell-val.editable:hover { color:var(--gold); }
-.cell-val.empty { color:#444; font-style:italic; font-size:12px; }
-.cell-val.email-val { color:#7ab4f5; font-size:12px; }
-.cell-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--gold); color:var(--text); font-size:13px; padding:1px 0; outline:none; }
-
-.badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
-.b-corpo{background:rgba(139,92,246,.15);color:#a78bfa;}
-.b-indus{background:rgba(59,130,246,.15);color:#60a5fa;}
-.b-agri{background:rgba(34,197,94,.15);color:#4ade80;}
-.b-sport{background:rgba(251,146,60,.15);color:#fb923c;}
-.b-golf{background:rgba(20,184,166,.15);color:#2dd4bf;}
-.b-bar{background:rgba(234,179,8,.15);color:#facc15;}
-.b-muni{background:rgba(99,102,241,.15);color:#818cf8;}
-
-input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:var(--gold); }
-input[type=checkbox]:disabled { cursor:default; opacity:.7; }
-
-.del-btn { background:none; border:none; cursor:pointer; color:#444; font-size:18px; padding:2px 4px; border-radius:4px; line-height:1; }
-.del-btn:hover { color:#f87171; background:rgba(248,113,113,.1); }
-
-.add-row td { background:rgba(201,168,76,.04); border-top:1px solid rgba(201,168,76,.2); }
-.add-input { width:100%; background:var(--input); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:12px; padding:4px 7px; outline:none; }
-.add-input:focus { border-color:var(--gold); }
-.add-select { width:100%; background:var(--input); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:12px; padding:4px 7px; outline:none; }
-
-.footer { padding:14px 24px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid var(--border); }
-.footer-msg { flex:1; font-size:12px; color:var(--muted); }
-
-.readonly-banner { background:rgba(37,99,235,.08); border-bottom:1px solid rgba(37,99,235,.2); padding:10px 24px; font-size:13px; color:#60a5fa; text-align:center; }
-
-@media(max-width:600px){ .stats{grid-template-columns:repeat(2,1fr);} }
-
-/* ── MODAL CONTRAT ── */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:1000; align-items:center; justify-content:center; padding:16px; }
-.modal-overlay.open { display:flex; }
-.modal { background:var(--dark); border:1px solid var(--border); border-radius:10px; width:100%; max-width:620px; max-height:90vh; overflow-y:auto; padding:28px; }
-.modal h3 { font-size:16px; font-weight:700; color:var(--gold); margin-bottom:18px; letter-spacing:1px; }
-.modal-section { font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:18px 0 10px; border-bottom:1px solid var(--border); padding-bottom:6px; }
-.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.modal-field { display:flex; flex-direction:column; gap:5px; }
-.modal-field label { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:.8px; text-transform:uppercase; }
-.modal-field input, .modal-field select, .modal-field textarea { background:var(--input); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:13px; padding:8px 11px; outline:none; width:100%; }
-.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color:var(--gold); }
-.modal-field textarea { min-height:70px; resize:vertical; }
-.modal-field.full { grid-column:1/-1; }
-.modal-actions { display:flex; gap:10px; margin-top:22px; justify-content:flex-end; flex-wrap:wrap; }
-.btn-modal-close { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:13px; padding:8px 18px; border-radius:6px; cursor:pointer; }
-.btn-modal-close:hover { border-color:var(--text); color:var(--text); }
-.btn-copy-email { background:var(--card); border:1px solid var(--border); color:var(--text); font-size:13px; padding:8px 18px; border-radius:6px; cursor:pointer; }
-.btn-copy-email:hover { background:#2a2a2a; }
-.btn-gen-pdf { background:var(--gold); border:none; color:var(--black); font-size:13px; font-weight:700; padding:8px 22px; border-radius:6px; cursor:pointer; }
-.btn-gen-pdf:hover { background:var(--cream); }
-.contrat-btn { background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.25); color:var(--gold); font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer; white-space:nowrap; }
-.contrat-btn:hover { background:rgba(201,168,76,.22); }
-.b-site { background:rgba(201,168,76,.18); color:var(--gold); }
-.orig-pre { background:var(--input); border:1px solid var(--border); border-radius:6px; padding:12px; font-size:11px; color:#9ca3af; overflow:auto; max-height:220px; white-space:pre-wrap; margin-top:6px; }
-.cal-row { display:flex; align-items:center; gap:12px; padding:9px 6px; border-bottom:1px solid #1e1e1e; font-size:13px; }
-.cal-row .cd { min-width:96px; color:var(--gold); font-weight:600; }
-.cal-row .cx { flex:1; min-width:0; }
-
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--texte);
+  font-family:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--ligne);background:var(--blanc);border-radius:var(--r);padding:9px 14px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.btn-p:active{background:var(--accent-fonce)}
+.btn-v{border-color:var(--accent);color:var(--accent);font-weight:600;background:var(--blanc)}
+.btn-d{border-color:var(--rouge);color:var(--rouge);background:var(--blanc)}
+.btn-s{padding:6px 11px;font-size:14px}
+a.btn-p,a.btn-v{display:inline-block;border:1px solid;border-radius:var(--r);padding:9px 14px;text-decoration:none}
+a.btn-p.btn-s,a.btn-v.btn-s{padding:6px 11px}
+.btn-w{width:100%}
+button[disabled]{opacity:.5;cursor:default}
+input[type=text],input[type=email],input[type=date],input[type=time],input[type=url],select,textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--ligne-champ);border-radius:var(--r);background:var(--blanc);font-size:16px}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:14px;font-weight:500;color:var(--texte);margin:12px 0 4px}
+label:first-child{margin-top:0}
+a{color:var(--accent)}
+h1{font-family:var(--titre);font-size:24px;font-weight:400;letter-spacing:-.01em;margin:0}
+h2{font-size:14px;font-weight:500;color:var(--gris);margin:18px 0 8px}
+h2:first-child{margin-top:0}
+p{margin:0}
+.m0{margin:0}
+.muet{color:var(--gris);font-size:14px}
+.petit{font-size:13px;color:var(--gris-pale)}
+.appli{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.entete{position:sticky;top:0;z-index:5;background:var(--fond);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.entete .js-logo,.entete .js-logo > *{width:30px;height:30px}
+.entete .titre{display:flex;align-items:center;gap:10px}
+.contenu{padding:0 16px 96px;flex:1}
+.barre{position:fixed;bottom:0;left:0;right:0;background:var(--blanc);border-top:1px solid var(--ligne);z-index:5;padding-bottom:env(safe-area-inset-bottom)}
+.barre-int{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.onglet{border:0;background:none;border-radius:0;padding:10px 4px 8px;font-size:12px;color:var(--gris);display:flex;flex-direction:column;align-items:center;gap:2px}
+.onglet svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.onglet.actif{color:var(--accent);font-weight:600}
+.carte{background:var(--blanc);border:1px solid var(--ligne);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.carte.accent{border:2px solid var(--accent)}
+.carte.fini{color:var(--gris-pale)}
+.ligne{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ligne > div:first-child{min-width:0;flex:1}
+.titre-t{font-size:15px;margin:0}
+.meta{font-size:13px;color:var(--gris-pale);margin-top:3px}
+.meta .point{vertical-align:1px;margin-right:5px}
+.point{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}
+.puces{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.puce{font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--ligne);background:var(--blanc);color:var(--gris)}
+.puce.actif{background:var(--accent);border-color:var(--accent);color:#fff}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.vide{text-align:center;color:var(--gris);padding:32px 12px;font-size:15px}
+.vide strong{display:block;color:var(--texte);font-weight:600;margin-bottom:4px}
+.mois{font-weight:600;font-size:15px;margin:16px 0 6px}
+.evt{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--ligne)}
+.evt .jour{text-align:center;min-width:40px}
+.evt .jour .n{font-size:20px;font-weight:600;line-height:1.1}
+.evt .jour .j{font-size:11px;color:var(--gris-pale)}
+.odj{margin:6px 0 0;padding:0;list-style:none}
+.odj li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--ligne);font-size:15px}
+.odj li:first-child{border-top:0}
+.odj .n{color:var(--gris-pale);margin-right:6px}
+.sous{border:1px solid var(--ligne);border-radius:var(--r);padding:7px 10px;margin-top:6px;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.annonce{background:var(--accent-pale);border:1px solid var(--accent-bord);border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.annonce .meta{color:var(--accent-fonce)}
+.voile{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--blanc);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:18px 18px 28px}
+.modal h1{font-size:18px;margin-bottom:10px}
+.modal .pied{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.erreur{color:var(--rouge);font-size:14px;margin-top:8px}
+.aide{font-size:13px;color:var(--gris);background:var(--blanc);border:1px dashed var(--ligne);border-radius:var(--r);padding:8px 12px;margin-bottom:12px}
+.connexion{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:32px 24px;max-width:420px;margin:0 auto;text-align:center}
+.connexion .js-logo{display:block;margin:0 auto 18px}
+.connexion .js-logo,.connexion .js-logo > *{width:110px;height:110px}
+.js-logo{display:block;flex:none}
+.js-logo img,.logo-apercu img{display:block;border-radius:50%;object-fit:contain;background:#fff;border:1px solid var(--ligne)}
+.pastille{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent);color:#fff;font-weight:600;flex:none}
+.entete .pastille{width:30px;height:30px;font-size:12px}
+.connexion .pastille{font-size:38px;letter-spacing:1px}
+.logo-apercu,.logo-apercu > *{width:64px;height:64px;flex:none}
+.logo-apercu .pastille{font-size:22px}
+.apercu{display:flex;align-items:center;gap:14px;padding:12px;border:1px dashed var(--ligne);border-radius:12px;margin-bottom:6px}
+.fichier-cache{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.btn-fichier{display:inline-block;margin:0;border:1px solid var(--accent);border-radius:var(--r);cursor:pointer;color:var(--accent);font-weight:600;padding:6px 11px;font-size:14px;background:var(--blanc)}
+.fichier-cache:focus-visible + .actions .btn-fichier{outline:3px solid var(--focus);outline-offset:2px}
+.nuancier{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nuance{width:34px;height:34px;border-radius:50%;padding:0;border:2px solid transparent}
+.nuance.actif{border-color:var(--texte);box-shadow:inset 0 0 0 2px #fff}
+input[type=color]{width:44px;height:34px;padding:2px;border:1px solid var(--ligne);border-radius:var(--r);background:var(--blanc)}
+.connexion h1{font-size:42px;letter-spacing:-.02em;line-height:1.1}
+.connexion .sous-titre{color:var(--gris);margin:6px 0 28px;font-size:15px}
+.connexion button{width:100%;margin-bottom:10px;padding:13px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--texte);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--ligne);vertical-align:top}
+th{font-weight:500;color:var(--gris)}
+.cache{display:none !important}
+.bandeau-demo{background:#0f1923;color:#fff;font-size:13px;text-align:center;padding:8px 16px;line-height:1.4}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
+<div id="bandeau-demo" class="bandeau-demo cache">Mode démonstration : données fictives, rien n'est enregistré. Collez la configuration Firebase pour l'utiliser pour vrai.</div>
 
-<!-- ═══ LOGIN ═══ -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">🎸 THAT'S HITS</div>
-    <div class="login-sub">Suivi démarchage 2026</div>
-    <input type="email" id="mail-input" autocomplete="username" placeholder="Courriel…" />
-    <input type="password" id="pwd-input" autocomplete="current-password" placeholder="Mot de passe…" />
-    <button class="btn-login" onclick="window.__crm.loginAdmin()">Se connecter</button>
-    <div class="login-err" id="login-err"></div>
-    <div style="font-size:11px;color:var(--muted);margin-top:14px">Accès réservé — administrateur et membres du groupe.</div>
-  </div>
+<div id="ecran-connexion" class="connexion cache">
+  <span class="js-logo"></span>
+  <h1>Korum</h1>
+  <p class="sous-titre" id="sous-titre-connexion"></p>
+  <button class="btn-p" id="btn-google">Continuer avec Google</button>
+  <details style="text-align:left;margin-top:8px">
+    <summary class="muet" style="cursor:pointer">Pas de compte Google ?</summary>
+    <label>Votre courriel</label>
+    <input type="email" id="courriel-lien" placeholder="nom@exemple.ca" autocomplete="email">
+    <button class="btn-v" id="btn-lien" style="margin-top:10px">Recevoir un lien de connexion</button>
+  </details>
+  <p class="erreur" id="err-connexion"></p>
+  <p class="petit" style="margin-top:24px" id="mention-acces"></p>
 </div>
 
-<!-- ═══ APP ═══ -->
-<div id="app-screen">
-
-  <div class="header">
-    <div class="header-left">
-      <div class="title">🎸 That's Hits — CRM Démarchage</div>
-      <div class="sub">Gaspésie &amp; Bas-Saint-Laurent</div>
-    </div>
-    <div class="header-right">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span style="font-size:12px;color:var(--muted)" id="sync-label">Connecté</span>
-      <span class="mode-badge" id="mode-badge"></span>
-      <button class="btn-sm" onclick="window.__crm.logout()">Déconnexion</button>
-    </div>
-  </div>
-
-  <div id="readonly-banner" class="readonly-banner" style="display:none">
-    👁 Mode lecture seule — vous consultez les données en temps réel
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="stat-label">Contacts</div><div class="stat-num" id="s-total">0</div></div>
-    <div class="stat"><div class="stat-label">Envoyés</div><div class="stat-num g" id="s-sent">0</div></div>
-    <div class="stat"><div class="stat-label">Réponses</div><div class="stat-num b" id="s-rep">0</div></div>
-    <div class="stat"><div class="stat-label">Confirmés</div><div class="stat-num p" id="s-rdv">0</div></div>
-  </div>
-
-  <div class="toolbar">
-    <input type="text" id="search" placeholder="🔍 Rechercher…" />
-    <select id="filter-type">
-      <option value="">Tous les types</option>
-      <option value="corpo">Corporatif</option>
-      <option value="indus">Industrie</option>
-      <option value="agri">Agriculture</option>
-      <option value="sport">Sport</option>
-      <option value="golf">Golf</option>
-      <option value="bar">Bar</option>
-      <option value="muni">Municipal</option>
-      <option value="festival">Festival</option>
-      <option value="orga">Organisme</option>
-      <option value="part">Particulier</option>
-    </select>
-    <select id="filter-status">
-      <option value="">Tous les statuts</option>
-      <option value="none">Pas encore envoyé</option>
-      <option value="sent">Envoyé</option>
-      <option value="rep">Réponse reçue</option>
-      <option value="rdv">Confirmé</option>
-    </select>
-    <button class="btn btn-gold" id="btn-add" onclick="window.__crm.toggleAddRow()">+ Ajouter</button>
-    <button class="btn" onclick="window.__crm.copyResume()">📋 Copier résumé</button>
-    <button class="btn" id="btn-contrats" onclick="window.__crm.ouvrirContrats()">📝 Contrats</button>
-    <button class="btn" onclick="window.__crm.ouvrirCalendrier()">📅 Calendrier</button>
-    <button class="btn" id="btn-seed" onclick="window.__crm.forceSeed()" style="display:none">🔄 Recharger contacts</button>
-  </div>
-
-  <div class="legend">
-    <span><span class="dot dg"></span>Envoyé</span>
-    <span><span class="dot db"></span>Réponse</span>
-    <span><span class="dot dp"></span>Confirmé</span>
-    <span id="edit-hint" style="font-style:italic;">Cliquer sur une cellule pour modifier</span>
-  </div>
-
-  <div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th class="col-org">Organisation</th>
-        <th class="col-contact">Personne contact</th>
-        <th class="col-email">Courriel</th>
-        <th class="col-type">Type</th>
-        <th class="col-cb" title="Envoyé">✓</th>
-        <th class="col-cb" title="Réponse">✉</th>
-        <th class="col-cb" title="Confirmé">★</th>
-        <th class="col-note">Notes</th>
-        <th style="width:7%;text-align:center">Contrat</th>
-      <th class="col-del" id="col-del-header"></th>
-      </tr>
-    </thead>
-    <tbody id="crm-body"></tbody>
-    <tbody id="add-tbody" style="display:none">
-      <tr class="add-row">
-        <td><input class="add-input" id="new-org" placeholder="Organisation…"/></td>
-        <td><input class="add-input" id="new-contact" placeholder="Prénom Nom…"/></td>
-        <td><input class="add-input" id="new-email" placeholder="courriel@…"/></td>
-        <td><select class="add-select" id="new-type">
-          <option value="corpo">Corporatif</option>
-          <option value="indus">Industrie</option>
-          <option value="agri">Agriculture</option>
-          <option value="sport">Sport</option>
-          <option value="golf">Golf</option>
-          <option value="bar">Bar</option>
-          <option value="muni">Municipal</option>
-          <option value="festival">Festival</option>
-          <option value="orga">Organisme</option>
-          <option value="part">Particulier</option>
-        </select></td>
-        <td colspan="4"></td>
-        <td><button class="btn btn-gold" onclick="window.__crm.addRow()" style="padding:4px 10px;font-size:12px">OK</button></td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
-
-  
-<!-- ══ MODAL CONTRAT ══ -->
-<div class="modal-overlay" id="modal-contrat">
-  <div class="modal">
-    <h3>📄 Générer confirmation & contrat</h3>
-
-    <div class="modal-section">Client</div>
-    <div class="modal-grid">
-      <div class="modal-field"><label>Organisation</label><input id="c-org" type="text" /></div>
-      <div class="modal-field"><label>Personne contact</label><input id="c-contact" type="text" /></div>
-      <div class="modal-field full"><label>Courriel</label><input id="c-email" type="email" /></div>
-    </div>
-
-    <div class="modal-section">Événement</div>
-    <div class="modal-grid">
-      <div class="modal-field"><label>Date</label><input id="c-date" type="date" /></div>
-      <div class="modal-field"><label>Heure de début</label><input id="c-heure" type="time" /></div>
-      <div class="modal-field"><label>Durée</label>
-        <select id="c-duree">
-          <option value="1 heure">1 heure</option>
-          <option value="1h30">1 h 30</option>
-          <option value="2 heures">2 heures</option>
-          <option value="2h30">2 h 30</option>
-          <option value="3 heures" selected>3 heures</option>
-          <option value="3 heures et plus">3 heures et plus</option>
-        </select>
-      </div>
-      <div class="modal-field"><label>Nombre de personnes</label><input id="c-nb" type="number" placeholder="ex. 100" /></div>
-      <div class="modal-field full"><label>Lieu / Adresse</label><input id="c-lieu" type="text" /></div>
-    </div>
-
-    <div class="modal-section">Prestation & Tarification</div>
-    <div class="modal-grid">
-      <div class="modal-field"><label>Montant total ($)</label><input id="c-montant" type="number" placeholder="ex. 1200" /></div>
-      <div class="modal-field"><label>Sonorisation</label>
-        <select id="c-sono">
-          <option value="fournie sur place">Fournie sur place</option>
-          <option value="apportée par le groupe">Apportée par le groupe</option>
-          <option value="à déterminer">À déterminer</option>
-        </select>
-      </div>
-      <div class="modal-field full"><label>Inclusions / Particularités</label>
-        <textarea id="c-inclusions" placeholder="ex. Jeux de lumière inclus, frais de déplacement inclus..."></textarea>
-      </div>
-      <div class="modal-field full"><label>Notes / Frais supplémentaires</label>
-        <textarea id="c-notes" placeholder="ex. Hébergement inclus, frais km à rembourser..."></textarea>
-      </div>
-    </div>
-
-    <div class="modal-section">Calendrier (site public)</div>
-    <div class="modal-grid">
-      <div class="modal-field full">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input id="c-cal-public" type="checkbox" style="width:auto" />
-          Afficher ce spectacle sur le calendrier du site une fois signé
-        </label>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Seuls le nom et la ville ci-dessous s'affichent — jamais l'adresse. Décoché = rien n'apparaît (événement privé).</div>
-      </div>
-      <div class="modal-field"><label>Nom affiché (public)</label><input id="c-cal-venue" type="text" placeholder="ex. Brasserie Gourmande" /></div>
-      <div class="modal-field"><label>Ville (publique)</label><input id="c-cal-city" type="text" placeholder="ex. Percé, QC" /></div>
-      <div class="modal-field"><label>Type (calendrier)</label>
-        <select id="c-cal-type">
-          <option value="bar">Bar</option>
-          <option value="festival">Festival</option>
-          <option value="fete">Fête nationale</option>
-          <option value="corpo">Corporatif</option>
-          <option value="prive">Privé</option>
-          <option value="pending">À confirmer</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-modal-close" onclick="window.__crm.closeContrat()">Annuler</button>
-      <button class="btn-copy-email" onclick="window.__crm.copyEmailContrat()">📋 Copier courriel</button>
-      <button class="btn-gen-pdf" onclick="window.__crm.genererPDF()">⬇ Télécharger PDF</button>
-      <button class="btn-sign-link" onclick="window.__crm.creerLienSignature()">🔗 Créer le lien de signature</button>
-    </div>
-  </div>
+<div id="ecran-refus" class="connexion cache">
+  <span class="js-logo"></span>
+  <h1>Accès non autorisé</h1>
+  <p class="sous-titre" id="refus-texte"></p>
+  <button class="btn-v" onclick="window.__deco()">Se déconnecter</button>
 </div>
 
-<div class="modal-overlay" id="modal-liste">
-  <div class="modal">
-    <h3>📝 Contrats envoyés pour signature</h3>
-    <div style="max-height:60vh;overflow:auto;margin-top:14px">
-      <table class="ct-table">
-        <thead><tr><th>Client</th><th>Date</th><th>Montant</th><th>Statut</th><th style="text-align:right">Actions</th></tr></thead>
-        <tbody id="ct-body"></tbody>
-      </table>
+<div id="appli" class="appli cache">
+  <header class="entete">
+    <div class="titre"><span class="js-logo"></span><h1 id="titre-onglet">Tâches</h1></div>
+    <button class="btn-s" id="btn-moi"></button>
+  </header>
+  <main class="contenu" id="contenu"></main>
+  <nav class="barre" aria-label="Sections">
+    <div class="barre-int">
+      <button class="onglet actif" data-onglet="taches"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Tâches</button>
+      <button class="onglet" data-onglet="rencontres"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1M15 14h1a4 4 0 0 1 4 4v2"/></svg>Rencontres</button>
+      <button class="onglet" data-onglet="calendrier"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>Calendrier</button>
+      <button class="onglet" data-onglet="documents"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 2h8a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg>Documents</button>
     </div>
-    <div class="modal-actions">
-      <button class="btn-modal-close" onclick="window.__crm.fermerContrats()">Fermer</button>
-    </div>
-  </div>
+  </nav>
 </div>
 
-<!-- ══ MODAL DÉTAIL DEMANDE ══ -->
-<div class="modal-overlay" id="modal-detail">
-  <div class="modal">
-    <h3>🔎 Détail de la demande</h3>
-    <div id="detail-body"></div>
-    <div class="modal-actions">
-      <button class="btn" id="detail-to-cal" onclick="window.__crm.calDepuisDemande()">📅 Ajouter au calendrier</button>
-      <button class="btn-modal-close" onclick="window.__crm.closeDetail()">Fermer</button>
-    </div>
-  </div>
-</div>
+<div id="modal-racine"></div>
+<div class="toast" id="toast"></div>
 
-<!-- ══ MODAL CALENDRIER ══ -->
-<div class="modal-overlay" id="modal-cal">
-  <div class="modal">
-    <h3>📅 Calendrier des spectacles</h3>
-    <div id="cal-form-wrap">
-      <div class="modal-section" id="cal-form-title">Ajouter un spectacle</div>
-      <div class="modal-grid">
-        <div class="modal-field"><label>Date</label><input id="cal-date" type="date" /></div>
-        <div class="modal-field"><label>Type</label>
-          <select id="cal-type">
-            <option value="bar">Bar / Boîte à chansons</option>
-            <option value="festival">Festival</option>
-            <option value="fete">Fête nationale</option>
-            <option value="corpo">Corporatif</option>
-            <option value="prive">Événement privé</option>
-            <option value="pending">À confirmer</option>
-          </select>
-        </div>
-        <div class="modal-field"><label>Salle / Lieu</label><input id="cal-venue" type="text" placeholder="ex. Brasserie Gourmande" /></div>
-        <div class="modal-field"><label>Ville</label><input id="cal-city" type="text" placeholder="ex. Percé, QC" /></div>
-        <div class="modal-field full"><label>Libellé (optionnel)</label><input id="cal-label" type="text" placeholder="Vide = libellé du type" /></div>
-        <div class="modal-field"><label>Client / Compagnie <span style="text-transform:none;color:#666">(privé)</span></label><input id="cal-client" type="text" placeholder="ex. Coop Purdel" /></div>
-        <div class="modal-field">
-          <label>Sur le site</label>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);margin-top:4px">
-            <input id="cal-client-public" type="checkbox" style="width:auto" />
-            Afficher le nom du client publiquement
-          </label>
-        </div>
-      </div>
-      <div class="modal-actions" style="justify-content:flex-start">
-        <button class="btn-gen-pdf" id="cal-save" onclick="window.__crm.saveCalEvent()">Ajouter</button>
-        <button class="btn-modal-close" id="cal-cancel" style="display:none" onclick="window.__crm.cancelCalEdit()">Annuler la modif</button>
-      </div>
-    </div>
-    <div class="modal-section">Spectacles au calendrier</div>
-    <div id="cal-list" style="max-height:42vh;overflow:auto"></div>
-    <div class="modal-actions" style="justify-content:space-between">
-      <button class="btn" id="cal-import" onclick="window.__crm.importerDatesDepart()" style="background:#333;color:#f0dfa0">⬇ Importer les 15 dates de départ</button>
-      <button class="btn-modal-close" onclick="window.__crm.fermerCalendrier()">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<div class="footer">
-    <div class="footer-msg" id="footer-msg">Données synchronisées en temps réel avec Firebase.</div>
-  </div>
-
-</div>
-
-<!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+/* ====== 1. CONFIGURATION FIREBASE — projet korum-ccmrc (Chambre de commerce de la MRC de La Matapédia) (console Firebase > Paramètres du projet > Vos applications) ====== */
 const firebaseConfig = {
-  apiKey: "AIzaSyB1kpeDjxx7HnMX_amrGUNiXHEiS0KhyzA",
-  authDomain: "thats-hits.firebaseapp.com",
-  databaseURL: "https://thats-hits-default-rtdb.firebaseio.com",
-  projectId: "thats-hits",
-  storageBucket: "thats-hits.firebasestorage.app",
-  messagingSenderId: "26811508803",
-  appId: "1:26811508803:web:c6ffd159134a28f36c4cf6"
+  apiKey: "AIzaSyBn2Enc0oYcDGKUsrtVZkcA9s-qpTBypmg",
+  authDomain: "korum-ccmrc.firebaseapp.com",
+  projectId: "korum-ccmrc",
+  storageBucket: "korum-ccmrc.firebasestorage.app",
+  messagingSenderId: "870494667762",
+  appId: "1:870494667762:web:8bb72609e41aadb35e216b"
 };
+/* ================================================================================================== */
 
-// Identifiant du compte admin, créé dans la console Firebase.
-// Ce n'est PAS un secret : c'est un identifiant public que les règles
-// Firestore comparent au jeton signé par Firebase. Le mot de passe,
-// lui, ne se trouve plus nulle part dans ce fichier.
-// Laisse la valeur vide au premier lancement : le CRM affichera ton UID
-// après la connexion, tu n'auras qu'à le recopier ici.
-const ADMIN_UID = "VIkDuRyGgBdJj0SNjHAWtumdeP62";
+/* ====== 2. VALEURS DE DÉPART — rien à modifier ici. Le nom, la couleur et le logo se changent dans l'app : menu > Réglages > Identité ====== */
+const DEPART = {
+  nom: "Mon organisme",
+  deNom: "de l'organisme",
+  instance: "Conseil d'administration",
+  couleur: "#2F5D8A",
+  contactAcces: "la personne qui gère l'outil",
+  logo: "",
+  etiquettes: [ { nom:"Conseil", couleur:"#1B5EA6", type:"comite" } ],
+  odj: ["Ouverture de la réunion","Lecture et adoption de l'ordre du jour","Adoption du procès-verbal de la dernière réunion","Suivi des finances","Correspondance","Varia","Prochaine rencontre","Levée de la réunion"]
+};
+const FUSEAU = "America/Toronto";
+const RAPPEL = "Les tâches ici sont celles du conseil et des comités. La gestion quotidienne reste à la direction.";
+/* ================================================================================================== */
 
-const TYPES = { corpo:'Corporatif', indus:'Industrie', agri:'Agriculture', sport:'Sport', golf:'Golf', bar:'Bar', muni:'Municipal', festival:'Festival', orga:'Organisme', part:'Particulier' };
-const BADGE = { corpo:'b-corpo', indus:'b-indus', agri:'b-agri', sport:'b-sport', golf:'b-golf', bar:'b-bar', muni:'b-muni', festival:'b-sport', orga:'b-muni', part:'b-golf' };
-
-const DEFAULTS = [
-  { id:'1',  org:'MRC de La Matapédia',              contact:'',               email:'administration@mrcmatapedia.quebec', type:'muni',    sent:false, rep:false, rdv:false, note:'' },
-  { id:'2',  org:'Uniboard Sayabec',                 contact:'',               email:'pr@uniboard.com',                   type:'indus',   sent:false, rep:false, rdv:false, note:'400 employés à Sayabec' },
-  { id:'3',  org:'Groupe RPF',                       contact:'',               email:'info@grouperpf.com',                type:'indus',   sent:false, rep:false, rdv:false, note:'Siège Sayabec, plusieurs filiales' },
-  { id:'4',  org:'Natrel / Agropur Amqui',           contact:'Éric Larrivée', email:'',                                  type:'indus',   sent:false, rep:false, rdv:false, note:'Directeur usine' },
-  { id:'5',  org:'Coop Purdel',                      contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'~380 emp., Amqui/Causapscal' },
-  { id:'6',  org:'Coop forestière Matapédia',        contact:'',               email:'',                                  type:'agri',    sent:false, rep:false, rdv:false, note:'Causapscal, 79 travailleurs' },
-  { id:'7',  org:'André Hallé et fils',              contact:'',               email:'andrehalleetfils@andrehalle.com',   type:'corpo',   sent:false, rep:false, rdv:false, note:'BRP, ~40 emp., Amqui/Matane/Rimouski' },
-  { id:'8',  org:'Lee Conciergerie',                 contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'leeconciergerie.com, Amqui' },
-  { id:'9',  org:'Club de golf Revermont',           contact:'',               email:'club.revermont@cgocable.ca',        type:'golf',    sent:false, rep:false, rdv:false, note:'Salle réception sur place' },
-  { id:'10', org:'Omnium Yves-Lévesque',             contact:'',               email:'omniumyl@gmail.com',               type:'sport',   sent:false, rep:false, rdv:false, note:'Volleyball, tournoi annuel Amqui' },
-  { id:'11', org:'Société agriculture Matapédia',    contact:'',               email:'expodelamatapedia@hotmail.com',    type:'agri',    sent:false, rep:false, rdv:false, note:'Expo agricole juin, Amqui' },
-  { id:'12', org:"Ville d'Amqui",                    contact:'',               email:'',                                  type:'muni',    sent:false, rep:false, rdv:false, note:'ville.amqui.qc.ca' },
-  { id:'13', org:'MRC de La Mitis',                  contact:'',               email:'mrcmitis@mitis.qc.ca',              type:'muni',    sent:false, rep:false, rdv:false, note:'Mont-Joli' },
-  { id:'14', org:'CISSS BSL',                        contact:'',               email:'',                                  type:'corpo',   sent:false, rep:false, rdv:false, note:'Mont-Joli et Amqui' },
-  { id:'15', org:'Oktobière de Gaspé',               contact:'Gabrielle Dunn', email:'',                                 type:'festival',sent:false, rep:false, rdv:false, note:'Via Jonathan Desjardins / La Boîte Flexible' },
-  { id:'16', org:'Microbrasserie La Captive',        contact:'',               email:'info@lacaptive.ca',                type:'bar',     sent:false, rep:false, rdv:false, note:'Amqui, salle spectacle 2e étage' },
-  { id:'17', org:'Bar Laser',                        contact:'',               email:'',                                  type:'bar',     sent:false, rep:false, rdv:false, note:'Causapscal, 418-756-5011' },
-  { id:'19', org:'Boston Pizza Canada',            contact:'',               email:'info@bostonpizza.com',              type:'corpo', sent:false, rep:false, rdv:false, note:'Tournée des étoiles montantes — musique live terrasses été. events.bostonpizza.com' },
-  { id:'18', org:'Microbrasserie Le Ketch',          contact:'Guillaume Desmeules', email:'desmeules@leketch.com',        type:'bar',     sent:false, rep:false, rdv:false, note:'Gestionnaire | 581 246-0100' },
-];
-
+const DEMO = String(firebaseConfig.apiKey).startsWith("À_REMPLACER") || new URLSearchParams(location.search).has("demo");
+const CHAMPS_ID = ["nom","deNom","instance","couleur","contactAcces","logo"];
+let ID = { ...DEPART };
+try{ if(!DEMO) ID = { ...ID, ...JSON.parse(localStorage.getItem("korum-identite")||"{}") }; }catch(e){}
+function initiales(nom){ return (nom||"").split(/[\s'’-]+/).filter(m => m.length > 2 && !/^(des|du|la|le|les|et|pour|sur|aux)$/i.test(m)).slice(0,2).map(m => m[0].toUpperCase()).join("") || "Q"; }
+function htmlLogo(id){ return id.logo && /^data:image\//.test(id.logo) ? `<img src="${id.logo}" alt="">` : `<div class="pastille" aria-hidden="true">${initiales(id.nom).replace(/[<>&"]/g,"")}</div>`; }
+function appliquerIdentite(id){
+  const couleur = /^#[0-9a-f]{6}$/i.test(id.couleur||"") ? id.couleur : DEPART.couleur;
+  document.documentElement.style.setProperty("--accent", couleur);
+  document.getElementById("meta-couleur").content = couleur;
+  document.getElementById("favicon").href = (id.logo && /^data:image\//.test(id.logo)) ? id.logo : "data:,";
+  document.querySelectorAll(".js-logo").forEach(el => el.innerHTML = htmlLogo(id));
+  document.title = "Korum — " + id.nom;
+  const e = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  document.getElementById("sous-titre-connexion").innerHTML = `${e(id.instance)}<br>${e(id.nom)}`;
+  document.getElementById("mention-acces").textContent = `Accès réservé aux membres et à l'équipe ${id.deNom}.`;
+}
+appliquerIdentite(ID);
+const V = "https://www.gstatic.com/firebasejs/10.12.2/";
+let F;
+if(DEMO) F = korumDemo();
+else {
+  try{ F = Object.assign({}, ...(await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f => import(V + f))))); }
+  catch(e){
+    document.getElementById("ecran-connexion").classList.remove("cache");
+    document.getElementById("btn-google").disabled = true;
+    document.getElementById("err-connexion").textContent = "Impossible de joindre Firebase. Vérifiez la connexion Internet, puis rechargez la page.";
+    throw e;
+  }
+}
+const { initializeApp, getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signOut,
+  getFirestore, collection, doc, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where, orderBy, serverTimestamp, writeBatch } = F;
+if(DEMO) document.getElementById("bandeau-demo").classList.remove("cache");
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
-const colRef = collection(db, 'contacts');
-const contratsRef = collection(db, 'contrats');
+const db = getFirestore(app);
 
-// Adresse publique de la page de signature.
-const SIGN_URL = 'https://croustia.github.io/thats-hits-crm/signature.html';
+onSnapshot(doc(db,"config","public"), s => {
+  const d = s.exists() ? s.data() : {};
+  ID = { ...DEPART };
+  CHAMPS_ID.forEach(k => { if(d[k] !== undefined && d[k] !== null) ID[k] = d[k]; });
+  try{ if(!DEMO) localStorage.setItem("korum-identite", JSON.stringify(ID)); }catch(e){}
+  appliquerIdentite(ID);
+  if(S.membre) rendre();
+}, e => console.warn("identité", e.message));
 
-let data = [];
-let isAdmin = false;
-let unsubscribe = null;
-let contrats = [];
-let unsubContrats = null;
-let contratContactId = null;
-let lienActuel = null;
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
+const ROLES = { admin:"Admin", gestion:"Gestion", executif:"Exécutif", membre:"Membre" };
+const NIVEAU = { admin:4, gestion:3, executif:2, membre:1 };
+const STATUTS = [["a_faire","À faire"],["en_cours","En cours"],["termine","Terminé"]];
+const COULEURS = ["#1B5EA6","#F5A800","#E1261C","#8DC63F","#3EB7B0","#7B3F98","#C0296F","#0B8A2B"];
+const ODJ_DEFAUT = DEPART.odj;
+const CONFIG_DEFAUT = { lienDocuments:"", lienSoumission:"", etiquettes:DEPART.etiquettes, odjModele:ODJ_DEFAUT };
 
-// ── CONTRAT ──
-function openContrat(id) {
-  const r = data.find(r => r.id === id);
-  if (!r) return;
-  contratContactId = r.id;
-  lienActuel = null;
-  document.getElementById('c-org').value = r.org || '';
-  document.getElementById('c-contact').value = r.contact || '';
-  document.getElementById('c-email').value = r.email || '';
-  document.getElementById('c-date').value = r.dateEvenement || '';
-  document.getElementById('c-heure').value = r.heureDebut || '';
-  document.getElementById('c-nb').value = r.nbPersonnes || '';
-  document.getElementById('c-lieu').value = r.lieu || r.note || '';
-  document.getElementById('c-montant').value = '';
-  const dureeMap = { '1h':'1 heure','1.5h':'1h30','2h':'2 heures','2.5h':'2h30','3h':'3 heures','3h+':'3 heures et plus' };
-  if (r.duree && dureeMap[r.duree]) document.getElementById('c-duree').value = dureeMap[r.duree];
-  const sonoMap = { oui:'apportée par le groupe', non:'fournie sur place', nsais:'à déterminer' };
-  if (r.sonorisation && sonoMap[r.sonorisation]) document.getElementById('c-sono').value = sonoMap[r.sonorisation];
-  document.getElementById('c-inclusions').value = '';
-  document.getElementById('c-notes').value = r.message || '';
-  // Calendrier public : valeurs par défaut dérivées de la demande
-  const calType = mapTypeCal(r.typeEvenement || r.type || '');
-  document.getElementById('c-cal-type').value = calType;
-  document.getElementById('c-cal-venue').value = r.org || '';
-  document.getElementById('c-cal-city').value = '';
-  document.getElementById('c-cal-public').checked = ['bar','festival','fete'].includes(calType);
-  document.getElementById('modal-contrat').classList.add('open');
-}
-
-// Devine le type de calendrier à partir du type d'événement de la demande
-function mapTypeCal(t) {
-  t = (t || '').toString().toLowerCase();
-  if (t.includes('festival')) return 'festival';
-  if (t.includes('bar')) return 'bar';
-  if (t.includes('corpo')) return 'corpo';
-  if (t.includes('national') || t.includes('fête') || t.includes('fete')) return 'fete';
-  if (t.includes('mariage') || t.includes('privé') || t.includes('prive') || t.includes('anniversaire')) return 'prive';
-  return 'pending';
-}
-
-function closeContrat() {
-  document.getElementById('modal-contrat').classList.remove('open');
-}
-
-function getContratData() {
-  const dateRaw = document.getElementById('c-date').value;
-  let dateFormatted = '';
-  if (dateRaw) {
-    const [y, m, d] = dateRaw.split('-');
-    const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-    dateFormatted = `${parseInt(d)} ${mois[parseInt(m)-1]} ${y}`;
-  }
-  return {
-    org: document.getElementById('c-org').value,
-    contact: document.getElementById('c-contact').value,
-    email: document.getElementById('c-email').value,
-    date: dateFormatted,
-    dateISO: dateRaw,
-    heure: document.getElementById('c-heure').value,
-    duree: document.getElementById('c-duree').value,
-    nb: document.getElementById('c-nb').value,
-    lieu: document.getElementById('c-lieu').value,
-    montant: document.getElementById('c-montant').value,
-    sono: document.getElementById('c-sono').value,
-    inclusions: document.getElementById('c-inclusions').value,
-    notes: document.getElementById('c-notes').value,
-    calPublic: document.getElementById('c-cal-public').checked,
-    calVenue: document.getElementById('c-cal-venue').value,
-    calCity: document.getElementById('c-cal-city').value,
-    calType: document.getElementById('c-cal-type').value,
-  };
-}
-
-// ── LIEN DE SIGNATURE ──
-
-// Jeton imprévisible : c'est lui qui protège l'accès au contrat.
-function nouveauJeton() {
-  const b = new Uint8Array(16);
-  crypto.getRandomValues(b);
-  return [...b].map(x => x.toString(36).padStart(2, '0')).join('').slice(0, 24);
-}
-
-// Crée le contrat dans Firestore et renvoie son lien.
-// Réutilise le lien déjà créé pour ce contrat (pas de doublon si on
-// clique « courriel » puis « lien », ou plusieurs fois).
-async function obtenirLien() {
-  if (lienActuel) return lienActuel;
-  const d = getContratData();
-  if (!d.org || !d.date || !d.montant) {
-    flashMsg('Organisation, date et montant sont requis.', 'var(--red)');
-    return null;
-  }
-  const jeton = nouveauJeton();
-  await setDoc(doc(db, 'contrats', jeton), {
-    id: jeton,
-    contactId: contratContactId,
-    org: d.org, contact: d.contact, email: d.email,
-    date: d.date, dateISO: d.dateISO, heure: d.heure, duree: d.duree, nb: d.nb,
-    lieu: d.lieu, montant: d.montant, sono: d.sono,
-    inclusions: d.inclusions, notes: d.notes,
-    calPublic: d.calPublic, calVenue: d.calVenue, calCity: d.calCity, calType: d.calType, calAjoute: false,
-    status: 'attente',
-    createdAt: new Date().toISOString(),
-    signataire: '', signataireTitre: '', signatureImg: '',
-    signedAt: null, signedUA: '', contratHash: ''
-  });
-  lienActuel = SIGN_URL + '?c=' + jeton;
-  return lienActuel;
-}
-
-async function creerLienSignature() {
-  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
-  try {
-    const lien = await obtenirLien();
-    if (!lien) return;
-    await navigator.clipboard.writeText(lien);
-    closeContrat();
-    flashMsg('✓ Lien de signature copié — collez-le dans le courriel au client.');
-  } catch (e) {
-    console.error(e);
-    flashMsg('Création du lien impossible. Vérifiez la connexion.', 'var(--red)');
-  }
-}
-
-
-function ouvrirContrats() {
-  document.getElementById('modal-liste').classList.add('open');
-  renderContrats();
-}
-
-function fermerContrats() {
-  document.getElementById('modal-liste').classList.remove('open');
-}
-
-function renderContrats() {
-  const body = document.getElementById('ct-body');
-  if (!contrats.length) {
-    body.innerHTML = '<tr><td colspan="5" class="ct-empty">Aucun contrat envoyé pour l\'instant.<br>Ouvrez un contact, remplissez le contrat, puis « Créer le lien de signature ».</td></tr>';
-    return;
-  }
-  const tri = [...contrats].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-  body.innerHTML = tri.map(c => {
-    const signe = c.status === 'signe';
-    const quand = signe && c.signedAt ? new Date(c.signedAt).toLocaleDateString('fr-CA') : '';
-    return `<tr>
-      <td style="font-weight:600">${esc(c.org)}<div style="color:var(--muted);font-weight:400;font-size:11px">${esc(c.contact || '')}</div></td>
-      <td>${esc(c.date || '—')}</td>
-      <td>${esc(c.montant || '—')} $</td>
-      <td><span class="pill ${signe ? 'pill-sig' : 'pill-att'}">${signe ? '✓ Signé ' + quand : '⏳ En attente'}</span></td>
-      <td style="text-align:right;white-space:nowrap">
-        <button class="mini" onclick="window.__crm.copierLien('${c.id}')">🔗 Lien</button>
-        <button class="mini" onclick="window.__crm.voirContrat('${c.id}')">👁 Voir</button>
-        ${isAdmin ? `<button class="mini" onclick="window.__crm.supprimerContrat('${c.id}')" style="color:var(--red)">×</button>` : ''}
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function copierLien(id) {
-  navigator.clipboard.writeText(SIGN_URL + '?c=' + id)
-    .then(() => flashMsg('✓ Lien copié.'));
-}
-
-function voirContrat(id) {
-  window.open(SIGN_URL + '?c=' + id, '_blank');
-}
-
-async function supprimerContrat(id) {
-  const c = contrats.find(x => x.id === id);
-  if (!isAdmin || !c) return;
-  const avert = c.status === 'signe'
-    ? `Ce contrat est SIGNÉ par ${c.signataire}. Le supprimer efface la preuve de signature. Continuer ?`
-    : `Supprimer le contrat de ${c.org} ? Le lien envoyé au client cessera de fonctionner.`;
-  if (!confirm(avert)) return;
-  await deleteDoc(doc(db, 'contrats', id));
-  flashMsg('Contrat supprimé.');
-}
-
-function ecouterContrats() {
-  if (unsubContrats) unsubContrats();
-  unsubContrats = onSnapshot(contratsRef, snap => {
-    contrats = snap.docs.map(d => d.data());
-    const enAttente = contrats.filter(c => c.status !== 'signe').length;
-    const signes = contrats.filter(c => c.status === 'signe').length;
-    const btn = document.getElementById('btn-contrats');
-    if (btn) btn.textContent = signes ? `📝 Contrats (${signes} signé${signes > 1 ? 's' : ''})` : `📝 Contrats${enAttente ? ' (' + enAttente + ')' : ''}`;
-    if (document.getElementById('modal-liste').classList.contains('open')) renderContrats();
-    publierSignesAuCalendrier();
-  }, err => console.error('contrats:', err));
-}
-
-// Convertit une date « 13 juin 2026 » en « 2026-06-13 » (repli pour les vieux contrats sans dateISO)
-function frToISO(txt) {
-  if (!txt) return '';
-  const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  const m = txt.trim().toLowerCase().match(/^(\d{1,2})\s+([a-zéûâ]+)\s+(\d{4})$/);
-  if (!m) return '';
-  const mi = mois.indexOf(m[2]);
-  if (mi < 0) return '';
-  return `${m[3]}-${String(mi+1).padStart(2,'0')}-${String(parseInt(m[1])).padStart(2,'0')}`;
-}
-
-// Dès qu'un contrat est signé et coché « afficher sur le site », crée l'entrée au calendrier.
-// N'expose que le nom public + la ville (jamais l'adresse). Idempotent : id de calendrier dérivé du contrat.
-const calEnCours = new Set();
-async function publierSignesAuCalendrier() {
-  if (!isAdmin) return;
-  for (const c of contrats) {
-    if (c.status !== 'signe' || !c.calPublic || c.calAjoute) continue;
-    if (calEnCours.has(c.id)) continue;
-    const iso = c.dateISO || frToISO(c.date);
-    if (!iso) continue;
-    calEnCours.add(c.id);
-    try {
-      await setDoc(doc(db, 'calendrier', 'sig_' + c.id), {
-        date: iso,
-        venue: c.calVenue || c.org || '',
-        city: c.calCity || '',
-        type: c.calType || 'pending',
-        client: c.org || null,
-        clientPublic: false,
-        source: 'contrat'
-      });
-      await updateDoc(doc(db, 'contrats', c.id), { calAjoute: true });
-    } catch (e) {
-      console.error('publication calendrier:', e);
-    } finally {
-      calEnCours.delete(c.id);
-    }
-  }
-}
-
-async function copyEmailContrat() {
-  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
-  const d = getContratData();
-  const lien = await obtenirLien();
-  if (!lien) return;
-  const email = `Bonjour ${d.contact || d.org},
-
-Suite à votre demande, nous avons le plaisir de confirmer la réservation de That's Hits pour votre événement.
-
-VÉRIFIER ET CONFIRMER VOTRE RÉSERVATION
-Pour confirmer, il vous suffit de vérifier les détails et de signer en ligne — c'est rapide et sécurisé :
-${lien}
-
-Pour les détails à venir, nous vous contacterons par téléphone.
-
-Nous vous remercions de votre confiance et avons hâte de faire de votre événement une soirée mémorable !
-
-Cordialement,
-Christian
-Représentant — That's Hits
-thats.hits.music@gmail.com
-https://thats-hits.tiiny.site`;
-
-  try {
-    await navigator.clipboard.writeText(email);
-    closeContrat();
-    flashMsg('✓ Courriel + lien de signature copiés — collez dans Gmail.');
-  } catch (e) {
-    console.error(e);
-    flashMsg('Copie impossible. Le contrat est enregistré ; réessayez.', 'var(--red)');
-  }
-}
-
-function genererPDF() {
-  const d = getContratData();
-  const inclusions = d.inclusions ? `<p><strong>Inclusions :</strong><br>${d.inclusions.replace(/\n/g,'<br>')}</p>` : '';
-  const notes = d.notes ? `<p><strong>Notes / Frais supplémentaires :</strong><br>${d.notes.replace(/\n/g,'<br>')}</p>` : '';
-
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Contrat That's Hits — ${d.org}</title>
-<style>
-  body { font-family: Georgia, serif; max-width: 720px; margin: 0 auto; padding: 40px 32px; color: #111; font-size: 14px; line-height: 1.7; }
-  .header { text-align: center; border-bottom: 2px solid #C9A84C; padding-bottom: 20px; margin-bottom: 28px; }
-  .logo-text { font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #C9A84C; }
-  .sub { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
-  .doc-title { font-size: 18px; font-weight: 700; text-align: center; margin: 24px 0 28px; text-transform: uppercase; letter-spacing: 2px; color: #333; }
-  .section { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #C9A84C; border-bottom: 1px solid #eee; padding-bottom: 5px; margin: 24px 0 14px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
-  .row { display: flex; gap: 8px; margin-bottom: 6px; }
-  .row-label { font-weight: 700; min-width: 160px; color: #555; font-size: 13px; }
-  .row-val { color: #111; font-size: 13px; }
-  .montant-box { background: #f9f5ec; border: 2px solid #C9A84C; border-radius: 6px; padding: 16px 20px; margin: 20px 0; text-align: center; }
-  .montant-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
-  .montant-val { font-size: 32px; font-weight: 700; color: #C9A84C; }
-  .paiement { font-size: 13px; color: #555; margin-top: 6px; }
-  .policy { background: #fafafa; border-left: 3px solid #C9A84C; padding: 12px 16px; font-size: 13px; color: #555; margin: 20px 0; }
-  .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
-  .sig-block { border-top: 1px solid #333; padding-top: 10px; font-size: 12px; color: #666; }
-  .sig-name { font-weight: 700; color: #333; font-size: 13px; }
-  .footer-doc { text-align: center; font-size: 11px; color: #aaa; margin-top: 40px; padding-top: 16px; border-top: 1px solid #eee; }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo-text">THAT'S HITS</div>
-  <div class="sub">Groupe de rock — Gaspésie & Bas-Saint-Laurent</div>
-</div>
-
-<div class="doc-title">Confirmation de réservation</div>
-
-<div class="section">Informations client</div>
-<div class="row"><span class="row-label">Organisation :</span><span class="row-val">${d.org}</span></div>
-<div class="row"><span class="row-label">Personne contact :</span><span class="row-val">${d.contact}</span></div>
-<div class="row"><span class="row-label">Courriel :</span><span class="row-val">${d.email}</span></div>
-
-<div class="section">Détails de l'événement</div>
-<div class="row"><span class="row-label">Date :</span><span class="row-val">${d.date}</span></div>
-<div class="row"><span class="row-label">Heure de début :</span><span class="row-val">${d.heure}</span></div>
-<div class="row"><span class="row-label">Durée :</span><span class="row-val">${d.duree}</span></div>
-<div class="row"><span class="row-label">Nombre de personnes :</span><span class="row-val">${d.nb}</span></div>
-<div class="row"><span class="row-label">Lieu :</span><span class="row-val">${d.lieu}</span></div>
-<div class="row"><span class="row-label">Sonorisation :</span><span class="row-val">${d.sono}</span></div>
-
-<div class="section">Tarification</div>
-<div class="montant-box">
-  <div class="montant-label">Montant total</div>
-  <div class="montant-val">${d.montant} $</div>
-  <div class="paiement">Paiement accepté : Virement Interac · Chèque · Argent comptant</div>
-</div>
-${inclusions}
-${notes}
-
-<div class="section">Politique d'annulation</div>
-<div class="policy">
-  Toute annulation effectuée moins de <strong>30 jours</strong> avant la date de l'événement entraîne des frais équivalant à <strong>50 % du montant total</strong> convenu.
-</div>
-
-<div class="section">Signatures</div>
-<div class="signatures">
-  <div class="sig-block">
-    <div class="sig-name">That's Hits</div>
-    Christian — Représentant<br>
-    thats.hits.music@gmail.com<br><br>
-    Signature : ___________________<br>
-    Date : ___________________
-  </div>
-  <div class="sig-block">
-    <div class="sig-name">${d.org}</div>
-    ${d.contact}<br><br><br>
-    Signature : ___________________<br>
-    Date : ___________________
-  </div>
-</div>
-
-<div class="footer-doc">
-  That's Hits · thats.hits.music@gmail.com · https://thats-hits.tiiny.site<br>
-  Document généré le ${new Date().toLocaleDateString('fr-CA')}
-</div>
-</body>
-</html>`;
-
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    win.onload = () => { win.print(); };
-  }
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
-  closeContrat();
-}
-
-// ── DÉTAIL DEMANDE ──
-const CHAMPS_PROSPECT = [
-  ['organisation','Organisation'], ['prenom','Prénom'], ['nom','Nom'],
-  ['email','Courriel'], ['telephone','Téléphone'], ['typeEvenement',"Type d'événement"],
-  ['dateEvenement','Date'], ['heureDebut','Heure de début'], ['duree','Durée'],
-  ['nbPersonnes','Nb de personnes'], ['lieu','Lieu / Adresse'], ['sonorisation','Sonorisation'],
-  ['budget','Budget'], ['commentTrouve','Comment nous a trouvés'], ['message','Message'],
-  ['equipementDetail','Précisions techniques'], ['note','Notes internes']
-];
-function openDetail(id){
-  const r = data.find(x => x.id === id);
-  if (!r) return;
-  detailId = id;
-  const box = document.getElementById('detail-body');
-  const champs = r._prospect ? CHAMPS_PROSPECT
-    : [['org','Organisation'],['contact','Personne contact'],['email','Courriel'],['note','Notes']];
-  let html = '<div class="modal-grid">';
-  for (const [f, label] of champs){
-    const val = esc(r[f] != null ? r[f] : '');
-    const full = ['lieu','message','equipementDetail','note'].includes(f) ? ' full' : '';
-    html += `<div class="modal-field${full}"><label>${label}</label><input data-f="${f}" value="${val}" ${isAdmin ? '' : 'disabled'} /></div>`;
-  }
-  html += '</div>';
-  if (r._prospect){
-    const eq = Array.isArray(r.equipement) ? r.equipement.join(', ') : '';
-    if (eq) html += `<div class="modal-section">Équipements demandés</div><div style="font-size:13px;color:#ccc">${esc(eq)}</div>`;
-    if (r.original){
-      html += `<div class="modal-section">Copie originale (non modifiable)</div><pre class="orig-pre">${esc(JSON.stringify(r.original, null, 2))}</pre>`;
-    }
-  }
-  box.innerHTML = html;
-  if (isAdmin){
-    box.querySelectorAll('input[data-f]').forEach(inp => {
-      inp.addEventListener('blur', async () => {
-        const f = inp.dataset.f, v = inp.value.trim();
-        if (v !== (r[f] != null ? String(r[f]) : '')){
-          setSyncing(true);
-          await updateDoc(doc(db, 'contacts', id), { [f]: v });
-          setSyncing(false);
-        }
-      });
-    });
-  }
-  document.getElementById('modal-detail').classList.add('open');
-}
-function closeDetail(){ document.getElementById('modal-detail').classList.remove('open'); detailId = null; }
-
-// Envoie une demande reçue vers le calendrier : ouvre le formulaire calendrier prérempli.
-function calDepuisDemande(){
-  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
-  const r = data.find(x => x.id === detailId);
-  if (!r) return;
-  closeDetail();
-  ouvrirCalendrier();
-  cancelCalEdit();
-  document.getElementById('cal-date').value = r.dateEvenement || '';
-  document.getElementById('cal-type').value = mapTypeCal(r.typeEvenement || r.type || '');
-  document.getElementById('cal-venue').value = r.lieu || r.org || '';
-  document.getElementById('cal-city').value = '';
-  document.getElementById('cal-client').value = r.org || r.organisation || r.contact || '';
-  document.getElementById('cal-client-public').checked = false;
-  document.getElementById('cal-label').value = '';
-  flashMsg('Vérifie la salle/ville (elles sont publiques) puis clique « Ajouter ». Le client reste privé sauf si tu coches la case.');
-}
-
-// ── CALENDRIER ──
-const CAL_TYPES = { bar:'Bar', festival:'Festival', fete:'Fête nationale', corpo:'Corporatif', prive:'Privé', pending:'À confirmer' };
-const CAL_MOIS = ['Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
-function watchCal(){
-  if (unsubCal) unsubCal();
-  unsubCal = onSnapshot(calRef, snap => {
-    calEvents = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-    calEvents.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-    if (document.getElementById('modal-cal').classList.contains('open')) renderCal();
-  }, err => console.error('calendrier:', err));
-}
-function ouvrirCalendrier(){
-  document.getElementById('cal-form-wrap').style.display = isAdmin ? '' : 'none';
-  cancelCalEdit();
-  renderCal();
-  document.getElementById('modal-cal').classList.add('open');
-}
-function fermerCalendrier(){ document.getElementById('modal-cal').classList.remove('open'); }
-function renderCal(){
-  const box = document.getElementById('cal-list');
-  if (!calEvents.length){ box.innerHTML = '<div class="ct-empty">Aucun spectacle. Ajoute-en un ci-dessus.</div>'; return; }
-  box.innerHTML = calEvents.map(ev => {
-    let j = '', m = '', y = '';
-    if (ev.date){ const p = ev.date.split('-'); if (p.length === 3){ j = p[2]; m = CAL_MOIS[parseInt(p[1],10)-1] || ''; y = p[0]; } }
-    const lab = ev.label || CAL_TYPES[ev.type] || '';
-    const cli = ev.client ? `<span style="color:#c9a84c">— ${esc(ev.client)}</span> ${ev.clientPublic ? '<span title="visible sur le site">🌐</span>' : '<span title="privé (CRM seulement)" style="opacity:.5">🔒</span>'}` : '';
-    return `<div class="cal-row">
-      <span class="cd">${j} ${m} ${y}</span>
-      <span class="cx"><strong>${esc(ev.venue||'')}</strong>${ev.city?' · '+esc(ev.city):''} <span class="pill pill-att" style="margin-left:6px">${esc(lab)}</span> ${cli}</span>
-      ${isAdmin ? `<span><button class="mini" onclick="window.__crm.editCalEvent('${ev.id}')">Modifier</button><button class="mini" style="color:var(--red)" onclick="window.__crm.delCalEvent('${ev.id}')">×</button></span>` : ''}
-    </div>`;
-  }).join('');
-}
-async function saveCalEvent(){
-  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
-  const d = {
-    date: document.getElementById('cal-date').value,
-    type: document.getElementById('cal-type').value,
-    venue: document.getElementById('cal-venue').value.trim(),
-    city: document.getElementById('cal-city').value.trim(),
-    label: document.getElementById('cal-label').value.trim() || null,
-    client: document.getElementById('cal-client').value.trim() || null,
-    clientPublic: document.getElementById('cal-client-public').checked
-  };
-  if (!d.date || !d.venue){ flashMsg('Date et salle/lieu requis.', 'var(--red)'); return; }
-  setSyncing(true);
-  const id = calEditId || ('ev_' + Date.now());
-  await setDoc(doc(db, 'calendrier', id), d);
-  setSyncing(false);
-  cancelCalEdit();
-  flashMsg('✓ Calendrier mis à jour — visible sur le site.');
-}
-function editCalEvent(id){
-  const ev = calEvents.find(x => x.id === id); if (!ev) return;
-  calEditId = id;
-  document.getElementById('cal-date').value = ev.date || '';
-  document.getElementById('cal-type').value = ev.type || 'bar';
-  document.getElementById('cal-venue').value = ev.venue || '';
-  document.getElementById('cal-city').value = ev.city || '';
-  document.getElementById('cal-label').value = ev.label || '';
-  document.getElementById('cal-client').value = ev.client || '';
-  document.getElementById('cal-client-public').checked = !!ev.clientPublic;
-  document.getElementById('cal-form-title').textContent = 'Modifier le spectacle';
-  document.getElementById('cal-save').textContent = 'Mettre à jour';
-  document.getElementById('cal-cancel').style.display = '';
-}
-function cancelCalEdit(){
-  calEditId = null;
-  ['cal-date','cal-venue','cal-city','cal-label','cal-client'].forEach(i => { const el = document.getElementById(i); if (el) el.value = ''; });
-  const cp = document.getElementById('cal-client-public'); if (cp) cp.checked = false;
-  const t = document.getElementById('cal-type'); if (t) t.value = 'bar';
-  const ft = document.getElementById('cal-form-title'); if (ft) ft.textContent = 'Ajouter un spectacle';
-  const sv = document.getElementById('cal-save'); if (sv) sv.textContent = 'Ajouter';
-  const cc = document.getElementById('cal-cancel'); if (cc) cc.style.display = 'none';
-}
-// Charge une fois les 15 dates de départ comme vraies entrées (modifiables/supprimables ensuite).
-// Idempotent : id fixe 'depart_NN' → recliquer n'ajoute pas de doublon.
-async function importerDatesDepart(){
-  if (!isAdmin) return flashMsg('Mode lecture seule.', 'var(--red)');
-  if (!confirm('Charger les 15 dates de départ dans le calendrier ? Tu pourras ensuite les modifier ou les supprimer une par une.')) return;
-  const DEPART = [
-    ['2026-05-15','La Mansarde','Matane','bar',null],
-    ['2026-05-29','Colisée Béton Provincial','Matane','festival',null],
-    ['2026-06-13','Brasserie Gourmande','Percé','bar',null],
-    ['2026-06-23','Fête nationale','Les Méchins','fete',null],
-    ['2026-06-24','Fête nationale','Ste-Félicité','fete',null],
-    ['2026-07-18','Brasserie Gourmande','Percé','bar',null],
-    ['2026-07-20','Talent Show','Matane','festival',null],
-    ['2026-07-23','Jeudi Ôquai','Ste-Flavie','festival',null],
-    ['2026-07-25','Party Camping','Beauce','prive',null],
-    ['2026-08-15','Brasserie Gourmande','Percé','bar',null],
-    ['2026-09-05','Brasserie Gourmande','Percé','bar',null],
-    ['2026-11-28','Party de Noël corpo','Ste-Anne-des-Monts','corpo',null],
-    ['2026-12-05','Party de Noël corpo','Matane','corpo',null],
-    ['2026-12-11','Party de Noël corpo','Matane','corpo',null],
-    ['2026-12-12','Confirmation à venir','','pending','Confirmation à venir']
-  ];
-  setSyncing(true);
-  try {
-    let n = 0;
-    for (let i = 0; i < DEPART.length; i++){
-      const [date, venue, city, type, label] = DEPART[i];
-      const id = 'depart_' + String(i+1).padStart(2,'0');
-      await setDoc(doc(db, 'calendrier', id), { date, venue, city, type, label });
-      n++;
-    }
-    flashMsg('✓ ' + n + ' dates importées — modifiables et supprimables ci-dessus.');
-  } catch (e) {
-    flashMsg('Import refusé : ' + (e.code || e.message), 'var(--red)');
-  }
-  setSyncing(false);
-}
-async function delCalEvent(id){
-  if (!isAdmin) return;
-  if (!confirm('Supprimer ce spectacle du calendrier ?')) return;
-  setSyncing(true);
-  await deleteDoc(doc(db, 'calendrier', id));
-  setSyncing(false);
-}
-
-// ── EXPOSE FUNCTIONS TO WINDOW ──
-window.__crm = { loginAdmin, logout, toggleAddRow, addRow, copyResume, editCell, toggle, del, openContrat, closeContrat, copyEmailContrat, genererPDF, forceSeed,
-  creerLienSignature, ouvrirContrats, fermerContrats, copierLien, voirContrat, supprimerContrat,
-  openDetail, closeDetail, calDepuisDemande, ouvrirCalendrier, fermerCalendrier, saveCalEvent, editCalEvent, delCalEvent, cancelCalEdit, importerDatesDepart };
-
-function setSyncing(yes) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot' + (yes ? ' syncing' : '');
-  lbl.textContent = yes ? 'Synchronisation…' : 'Connecté';
-}
-
-async function seedIfEmpty() {
-  try {
-    const snap = await getDocs(colRef);
-    if (snap.empty && isAdmin) {
-      setSyncing(true);
-      for (const row of DEFAULTS) {
-        await setDoc(doc(db, 'contacts', row.id), row);
-      }
-      setSyncing(false);
-      flashMsg('✓ ' + DEFAULTS.length + ' contacts chargés dans Firebase !');
-    }
-  } catch(e) {
-    console.error('Firestore error:', e);
-    // Fallback: utiliser les données locales
-    data = JSON.parse(JSON.stringify(DEFAULTS));
-    render();
-    document.getElementById('sync-label').textContent = 'Mode hors ligne';
-    document.getElementById('sync-dot').style.background = '#f59e0b';
-    flashMsg('⚠ Firebase inaccessible — données locales utilisées.');
-  }
-}
-
-async function forceSeed() {
-  if (!confirm('Recharger tous les contacts par défaut ? Les données existantes seront conservées.')) return;
-  setSyncing(true);
-  for (const row of DEFAULTS) {
-    await setDoc(doc(db, 'contacts', row.id), row);
-  }
-  setSyncing(false);
-  flashMsg('✓ ' + DEFAULTS.length + ' contacts rechargés !');
-}
-window.__crm.forceSeed = forceSeed;
-
-const calRef = collection(db, 'calendrier');
-let calEvents = [];
-let unsubCal = null;
-let detailId = null;
-let calEditId = null;
-
-const TYPE_EVT = { mariage:'part', festival:'festival', bar:'bar', corporatif:'corpo', anniversaire:'part', prive:'part', autre:'corpo' };
-function estProspect(r){ return r && (r.source === 'site' || r.statut === 'prospect' || r.typeEvenement !== undefined); }
-function nomComplet(r){ return [r.prenom, r.nom].filter(Boolean).join(' '); }
-function normaliser(r){
-  if (!estProspect(r)) return r;
-  const nom = nomComplet(r);
-  return Object.assign({}, r, {
-    _prospect: true,
-    org: r.org || r.organisation || (nom || '(Particulier)'),
-    contact: r.contact || nom,
-    email: r.email || '',
-    type: r.type || TYPE_EVT[r.typeEvenement] || 'corpo',
-    note: r.note || ('Demande site' + (r.typeEvenement ? ' — ' + r.typeEvenement : '') + (r.dateEvenement ? ' · ' + r.dateEvenement : ''))
-  });
-}
-function trierContacts(a, b){
-  const pa = a._prospect ? 0 : 1, pb = b._prospect ? 0 : 1;
-  if (pa !== pb) return pa - pb;
-  if (a._prospect){
-    const sa = (a.dateSoumission && a.dateSoumission.seconds) || 0;
-    const sb = (b.dateSoumission && b.dateSoumission.seconds) || 0;
-    return sb - sa;
-  }
-  return Number(a.id) - Number(b.id);
-}
-
-function startListening() {
-  if (unsubscribe) unsubscribe();
-  unsubscribe = onSnapshot(colRef, snap => {
-    data = snap.docs.map(d => normaliser(Object.assign({ id: d.id }, d.data())));
-    data.sort(trierContacts);
-    render();
-  });
-}
-
-const ERREURS_AUTH = {
-  'auth/invalid-email': "Ce courriel n'est pas valide.",
-  'auth/invalid-credential': 'Courriel ou mot de passe incorrect.',
-  'auth/wrong-password': 'Courriel ou mot de passe incorrect.',
-  'auth/user-not-found': 'Courriel ou mot de passe incorrect.',
-  'auth/too-many-requests': 'Trop de tentatives. Réessaie dans quelques minutes.',
-  'auth/network-request-failed': 'Connexion impossible. Vérifie ton accès Internet.',
-  'auth/operation-not-allowed': "Le mode de connexion n'est pas activé dans la console Firebase."
+const S = {
+  user:null, membre:null, config:CONFIG_DEFAUT,
+  taches:[], rencontres:[], calendrier:[], annonces:[], ressources:[], membres:[],
+  onglet:"taches", filtre:"tous", vueAdmin:null, subs:[]
 };
+const moi = () => S.membre?.courriel || "";
+const niv = () => NIVEAU[S.membre?.role] || 0;
+const estAdmin = () => niv() >= 4, estGestion = () => niv() >= 3, estExecutif = () => niv() >= 2;
+const nomDe = c => (S.membres.find(m => m.courriel === c)?.nom) || c || "";
+const etq = n => S.config.etiquettes.find(e => e.nom === n) || { nom:n, couleur:"#9a9a9a" };
+const aujourdhui = () => new Date().toISOString().slice(0,10);
 
-function erreurAuth(e) {
-  return ERREURS_AUTH[e && e.code] || "La connexion a échoué. Réessaie.";
-}
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const JOURS = ["dim","lun","mar","mer","jeu","ven","sam"];
+const MOIS_COURT = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+function fmtDate(iso, court){ if(!iso) return ""; const [a,m,j] = iso.split("-").map(Number); const d = new Date(a,m-1,j);
+  return court ? `${j} ${MOIS_COURT[m-1]}` : `${JOURS[d.getDay()]} ${j} ${MOIS[m-1]} ${a}`; }
+function fmtHeure(h){ return h ? h.replace(":"," h ") : ""; }
+function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2200); }
 
-async function loginAdmin() {
-  const mail = document.getElementById('mail-input').value.trim();
-  const pwd = document.getElementById('pwd-input').value;
-  const err = document.getElementById('login-err');
-  err.textContent = '';
-  if (!mail || !pwd) { err.textContent = 'Entre ton courriel et ton mot de passe.'; return; }
-  try {
-    // Firebase vérifie le mot de passe sur ses serveurs et renvoie un
-    // jeton signé. onAuthStateChanged prend le relais et ouvre le CRM.
-    await signInWithEmailAndPassword(auth, mail, pwd);
-  } catch (e) {
-    err.textContent = erreurAuth(e);
+/* ---------- Authentification ---------- */
+const actionCodeSettings = { url: location.href.split("#")[0], handleCodeInApp:true };
+$("#btn-google").onclick = () => connecter(new GoogleAuthProvider());
+$("#btn-lien").onclick = async () => {
+  const c = $("#courriel-lien").value.trim().toLowerCase();
+  if(!c){ $("#err-connexion").textContent = "Entrez votre courriel."; return; }
+  try{ await sendSignInLinkToEmail(auth, c, actionCodeSettings); localStorage.setItem("korum-courriel", c);
+    $("#err-connexion").textContent = ""; toast("Lien envoyé. Ouvrez votre courriel."); }
+  catch(e){ $("#err-connexion").textContent = "Envoi impossible : " + e.message; }
+};
+async function connecter(p){
+  $("#err-connexion").textContent = "";
+  try{ await signInWithPopup(auth, p); }
+  catch(e){
+    if(/popup|blocked|cancelled/i.test(e.code||"")){ try{ await signInWithRedirect(auth,p); }catch(e2){ $("#err-connexion").textContent = e2.message; } }
+    else $("#err-connexion").textContent = "Connexion impossible : " + e.message;
   }
 }
+window.__deco = () => signOut(auth);
+(async () => {
+  try{ await getRedirectResult(auth); }catch(e){}
+  if(isSignInWithEmailLink(auth, location.href)){
+    let c = localStorage.getItem("korum-courriel") || prompt("Confirmez votre courriel");
+    try{ await signInWithEmailLink(auth, c, location.href); history.replaceState(null,"",location.pathname); }catch(e){ alert("Lien invalide ou expiré."); }
+  }
+})();
 
-// Point d'entrée unique : la session survit aux rechargements de page.
 onAuthStateChanged(auth, async user => {
-  if (!user) { afficherConnexion(); return; }
-  isAdmin = (!!ADMIN_UID && user.uid === ADMIN_UID);
-  await showApp();
-  if (isAdmin && !ADMIN_UID) {
-    console.log('UID admin à recopier dans ADMIN_UID :', user.uid);
-    alert("Configuration à terminer.\n\nRecopie cet UID dans la constante ADMIN_UID de index.html, puis republie la page :\n\n" + user.uid);
+  S.subs.forEach(u=>u()); S.subs=[];
+  S.user = user; S.membre = null;
+  if(!user){ montrer("connexion"); return; }
+  const courriel = (user.email||"").toLowerCase();
+  let snap; try{ snap = await getDoc(doc(db,"membres",courriel)); }catch(e){ snap = null; }
+  if(!snap || !snap.exists() || snap.data().actif === false){
+    $("#refus-texte").innerHTML = `Le compte <strong>${esc(courriel)}</strong> n'est pas dans la liste des administrateurs.<br>Contactez ${esc(ID.contactAcces)} pour l'ajouter.`;
+    montrer("refus"); return;
   }
+  S.membre = { courriel, ...snap.data() };
+  montrer("appli"); abonner(); rendre();
 });
+function montrer(q){ ["connexion","refus"].forEach(k=>$("#ecran-"+k).classList.toggle("cache", q!==k)); $("#appli").classList.toggle("cache", q!=="appli"); }
 
-function afficherConnexion() {
-  isAdmin = false;
-  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-  if (unsubContrats) { unsubContrats(); unsubContrats = null; }
-  if (unsubCal) { unsubCal(); unsubCal = null; }
-  document.getElementById('app-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('pwd-input').value = '';
-  document.getElementById('login-err').textContent = '';
+/* ---------- Données en temps réel ---------- */
+function abonner(){
+  const ecouter = (q, cle, tri) => S.subs.push(onSnapshot(q, s => { S[cle] = s.docs.map(d=>({id:d.id, ...d.data()})); if(tri) S[cle].sort(tri); rendre(); },
+    e => console.warn(cle, e.message)));
+  ecouter(collection(db,"taches"), "taches", (a,b)=> (a.echeance||"9999").localeCompare(b.echeance||"9999") || (a.titre||"").localeCompare(b.titre||""));
+  ecouter(collection(db,"rencontres"), "rencontres", (a,b)=> (b.date||"").localeCompare(a.date||""));
+  ecouter(collection(db,"calendrier"), "calendrier", (a,b)=> (a.date||"").localeCompare(b.date||"") || (a.heure||"").localeCompare(b.heure||""));
+  ecouter(collection(db,"annonces"), "annonces", (a,b)=> (b.epingle?1:0)-(a.epingle?1:0) || (b.date?.seconds||0)-(a.date?.seconds||0));
+  ecouter(collection(db,"ressources"), "ressources", (a,b)=> (a.ordre||0)-(b.ordre||0));
+  ecouter(collection(db,"membres"), "membres", (a,b)=> (a.nom||"").localeCompare(b.nom||""));
+  S.subs.push(onSnapshot(doc(db,"config","general"), s => { S.config = { ...CONFIG_DEFAUT, ...(s.exists()? s.data():{}) }; if(!S.config.etiquettes?.length) S.config.etiquettes = CONFIG_DEFAUT.etiquettes; rendre(); }));
+}
+// Les membres sont indexés par courriel (id du document)
+const membresListe = () => S.membres.map(m => ({ ...m, courriel:m.id }));
+
+/* ---------- Archivage automatique (session admin) ---------- */
+let archiveFait = false;
+async function archiverVieillesTaches(){
+  if(!estAdmin() || archiveFait) return; archiveFait = true;
+  const limite = Date.now() - 30*86400000;
+  const lot = writeBatch(db); let n=0;
+  S.taches.forEach(t => { if(t.statut==="termine" && !t.archive && t.termineLe?.seconds && t.termineLe.seconds*1000 < limite){ lot.update(doc(db,"taches",t.id), { archive:true }); n++; } });
+  if(n){ await lot.commit(); }
 }
 
-async function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display = 'block';
-  document.getElementById('mode-badge').textContent = isAdmin ? '⚙ Admin' : '👁 Lecture seule';
-  document.getElementById('mode-badge').className = 'mode-badge ' + (isAdmin ? 'mode-admin' : 'mode-read');
-  document.getElementById('readonly-banner').style.display = isAdmin ? 'none' : 'block';
-  document.getElementById('btn-add').style.display = isAdmin ? '' : 'none';
-  document.getElementById('btn-seed').style.display = isAdmin ? '' : 'none';
-  document.getElementById('edit-hint').style.display = isAdmin ? '' : 'none';
-  await seedIfEmpty();
-  startListening();
-  ecouterContrats();
-  watchCal();
-}
+/* ---------- Navigation ---------- */
+$$(".onglet").forEach(b => b.onclick = () => { S.onglet = b.dataset.onglet; S.vueAdmin = null; S.filtre = "tous"; S.brouillonId = null; rendre(); window.scrollTo(0,0); });
+$("#btn-moi").onclick = () => menuMoi();
 
-async function logout() {
-  await signOut(auth);   // onAuthStateChanged ramène l'écran de connexion
+function rendre(){
+  if(!S.membre) return;
+  S.membres = membresListe();
+  archiverVieillesTaches();
+  $$(".onglet").forEach(b => b.classList.toggle("actif", b.dataset.onglet === S.onglet && !S.vueAdmin));
+  $("#btn-moi").textContent = (S.membre.nom || S.membre.courriel).split(" ")[0];
+  const titres = { taches:"Tâches", rencontres:"Rencontres", calendrier:"Calendrier", documents:"Documents", historique:"Historique", membres:"Membres", reglages:"Réglages" };
+  $("#titre-onglet").textContent = titres[S.vueAdmin || S.onglet];
+  const actif = document.activeElement;
+  if(actif && $("#contenu").contains(actif) && /^(INPUT|TEXTAREA|SELECT)$/.test(actif.tagName) && actif.type !== "file"){ S.renduEnAttente = true; return; }
+  S.renduEnAttente = false;
+  const vue = S.vueAdmin || S.onglet;
+  const r = { taches:vueTaches, rencontres:vueRencontres, calendrier:vueCalendrier, documents:vueDocuments, historique:vueHistorique, membres:vueMembres, reglages:vueReglages }[vue];
+  $("#contenu").innerHTML = r();
+  lier();
+  if(vue === "reglages") lierIdentite();
 }
+function lier(){ $$("[data-act]").forEach(el => el.onclick = e => { e.preventDefault(); ACTIONS[el.dataset.act]?.(el.dataset, el); }); }
 
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+/* ---------- Mode démonstration : imite Firebase en mémoire ---------- */
+function korumDemo(){
+  const store = new Map(), ecoutes = new Set(), abonnes = new Set();
+  const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
+  const parent = p => p.split("/").slice(0,-1).join("/");
+  const idNeuf = () => Math.random().toString(36).slice(2,12);
+  const maintenant = () => ({ seconds: Math.floor(Date.now()/1000) });
+  const val = v => (v && v.seconds !== undefined) ? v.seconds : (v ?? "");
+  function snapCol(ref){
+    const docs = [...store.entries()].filter(([p]) => parent(p) === ref.path).map(([p,d]) => ({ id:p.split("/").pop(), data:() => clone(d) }));
+    (ref.tri||[]).forEach(([c,s]) => docs.sort((a,b) => { const x = val(a.data()[c]), y = val(b.data()[c]); return (x>y?1:x<y?-1:0) * (s==="desc"?-1:1); }));
+    return { docs };
+  }
+  function snapDoc(ref){ const d = store.get(ref.path); return { id:ref.id, exists:() => d !== undefined, data:() => clone(d) }; }
+  const snap = ref => ref.type === "col" ? snapCol(ref) : snapDoc(ref);
+  const avertir = () => ecoutes.forEach(e => setTimeout(() => e.cb(snap(e.ref)), 0));
+  let utilisateur = null;
+  const changer = u => { utilisateur = u; abonnes.forEach(cb => setTimeout(() => cb(u), 0)); };
 
-function getFiltered() {
-  const s = document.getElementById('search').value.toLowerCase();
-  const ft = document.getElementById('filter-type').value;
-  const fs = document.getElementById('filter-status').value;
-  return data.filter(r => {
-    if (s && ![r.org,r.contact,r.email,r.note].some(f=>(f||'').toLowerCase().includes(s))) return false;
-    if (ft && r.type !== ft) return false;
-    if (fs==='sent' && !r.sent) return false;
-    if (fs==='rep' && !r.rep) return false;
-    if (fs==='rdv' && !r.rdv) return false;
-    if (fs==='none' && r.sent) return false;
-    return true;
-  });
-}
+  // Données fictives, datées par rapport à aujourd'hui
+  const jour = n => { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+  const moi = "vous@demo.korum";
+  const set = (p, d) => store.set(p, d);
+  set("config/public", { nom:"Association exemple de la Vallée", deNom:"de l'Association", instance:"Conseil d'administration", couleur:"#2F5D8A", contactAcces:"la personne qui gère l'outil", logo:"" });
+  set("config/general", { lienDocuments:"", lienSoumission:"kihosq-soumission.html",
+    etiquettes:[{nom:"CA",couleur:"#1B5EA6",type:"comite"},{nom:"Événements",couleur:"#F5A800",type:"comite"},{nom:"Financement",couleur:"#8DC63F",type:"dossier"}],
+    odjModele:DEPART.odj });
+  set("membres/"+moi, { nom:"Vous", role:"admin", actif:true });
+  set("membres/marie@demo.korum", { nom:"Marie Tremblay", titre:"Directrice générale", role:"gestion", actif:true, codeLuLe:jour(-60), declarationAnnee:new Date().getFullYear() });
+  set("membres/luc@demo.korum", { nom:"Luc Gagnon", titre:"Trésorier", role:"executif", actif:true, codeLuLe:jour(-90) });
+  set("membres/sophie@demo.korum", { nom:"Sophie Bélanger", role:"membre", actif:true });
+  const odj = ["Ouverture de la réunion","Lecture et adoption de l'ordre du jour","Adoption du procès-verbal de la dernière réunion","Budget de l'an prochain","Gala annuel","Suivi des finances","Correspondance","Varia","Prochaine rencontre","Levée de la réunion"];
+  set("rencontres/r1", { type:"CA", date:jour(12), heure:"18:30", lieu:"Salle du conseil", ordreDuJour:odj, lienPV:"" });
+  set("rencontres/r0", { type:"CA", date:jour(-18), heure:"18:30", lieu:"Salle du conseil", ordreDuJour:odj.slice(0,4), lienPV:"https://example.com/pv" });
+  set("calendrier/renc_r1", { date:jour(12), heure:"18:30", titre:"CA", type:"rencontre", etiquette:"CA", lieu:"Salle du conseil", rencontreId:"r1" });
+  set("calendrier/e1", { date:jour(24), heure:"17:00", titre:"5 à 7 des membres", type:"evenement", lieu:"Bistro du centre-ville" });
+  set("calendrier/e2", { date:jour(52), heure:"18:00", titre:"Gala annuel", type:"evenement", lieu:"Grande salle municipale" });
+  const t = (id, d) => set("taches/"+id, { archive:false, nbCommentaires:0, rencontreId:"", pointOdj:"", creePar:"marie@demo.korum", description:"", echeance:"", ...d });
+  t("t1", { titre:"Trouver un traiteur pour le Gala", etiquette:"Événements", statut:"a_faire", responsable:"", description:"Environ 120 personnes, cocktail dînatoire.", rencontreId:"r0", pointOdj:"Gala annuel" });
+  t("t2", { titre:"Préparer le budget de l'an prochain", etiquette:"Financement", statut:"a_faire", responsable:moi, echeance:jour(9) });
+  t("t3", { titre:"Réserver la salle pour le 5 à 7", etiquette:"Événements", statut:"en_cours", responsable:"luc@demo.korum", echeance:jour(5), nbCommentaires:1 });
+  t("t4", { titre:"Envoyer les convocations de l'assemblée", etiquette:"CA", statut:"termine", responsable:"marie@demo.korum", termineLe:maintenant() });
+  t("t5", { titre:"Mettre à jour la liste des partenaires", etiquette:"CA", statut:"a_faire", responsable:"sophie@demo.korum", echeance:jour(20) });
+  set("taches/t3/commentaires/c1", { texte:"J'ai appelé le bistro, ils nous rappellent jeudi.", auteur:"luc@demo.korum", auteurNom:"Luc Gagnon", date:maintenant() });
+  set("annonces/a1", { texte:"Les photos du dernier événement sont dans le dossier partagé.", auteur:"marie@demo.korum", auteurNom:"Marie Tremblay", date:maintenant(), epingle:false });
+  set("ressources/d1", { titre:"Code d'éthique de l'administrateur", description:"À lire avant votre première rencontre", lien:"https://example.com/code-ethique", pour:"tous", ordre:1, accuse:true });
+  set("ressources/d2", { titre:"Guide de l'administrateur", lien:"https://example.com/guide", pour:"tous", ordre:2, accuse:false });
 
-function render() {
-  const filtered = getFiltered();
-  const editable = isAdmin;
-  document.getElementById('crm-body').innerHTML = filtered.map(r => `
-    <tr data-id="${esc(r.id)}">
-      <td class="col-org">${r._prospect?'<span class="badge b-site">Site</span> ':''}<span class="cell-val ${editable?'editable':''}" style="font-weight:600" ${editable?`onclick="window.__crm.editCell('${r.id}','org',this)"`:''}>${esc(r.org)}</span></td>
-      <td class="col-contact"><span class="cell-val ${r.contact?'':'empty'} ${editable?'editable':''}" ${editable?`onclick="window.__crm.editCell('${r.id}','contact',this)"`:''}>${r.contact?esc(r.contact):(editable?'— ajouter —':'—')}</span></td>
-      <td class="col-email"><span class="cell-val ${r.email?'email-val':'empty'} ${editable?'editable':''}" ${editable?`onclick="window.__crm.editCell('${r.id}','email',this)"`:''}>${r.email?esc(r.email):(editable?'— ajouter —':'—')}</span></td>
-      <td class="col-type"><span class="badge ${BADGE[r.type]||'b-corpo'}">${TYPES[r.type]||r.type}</span></td>
-      <td class="col-cb"><input type="checkbox" ${r.sent?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','sent',this.checked)"`:' disabled'} /></td>
-      <td class="col-cb"><input type="checkbox" ${r.rep?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','rep',this.checked)"`:' disabled'} /></td>
-      <td class="col-cb"><input type="checkbox" ${r.rdv?'checked':''} ${editable?`onchange="window.__crm.toggle('${r.id}','rdv',this.checked)"`:' disabled'} /></td>
-      <td class="col-note"><span class="cell-val ${r.note?'':'empty'} ${editable?'editable':''}" style="color:#aaa" ${editable?`onclick="window.__crm.editCell('${r.id}','note',this)"`:''}>${r.note?esc(r.note):'—'}</span></td>
-      <td style="text-align:center"><button class="mini" onclick="window.__crm.openDetail('${r.id}')" title="Voir la demande">🔎</button><button class="contrat-btn" onclick="window.__crm.openContrat('${r.id}')">📄 Contrat</button></td>
-      <td class="col-del">${editable?`<button class="del-btn" onclick="window.__crm.del('${r.id}')" title="Supprimer">×</button>`:''}</td>
-    </tr>
-  `).join('');
-  updateStats();
-}
-
-async function editCell(id, field, el) {
-  if (!isAdmin) return;
-  const r = data.find(r=>r.id===id);
-  if (!r) return;
-  const inp = document.createElement('input');
-  inp.className = 'cell-input';
-  inp.value = r[field]||'';
-  inp.placeholder = field==='contact'?'Prénom Nom…':field==='email'?'courriel@…':field==='org'?'Organisation…':'Notes…';
-  el.replaceWith(inp);
-  inp.focus(); inp.select();
-  const commit = async () => {
-    const val = inp.value.trim();
-    if (val !== (r[field]||'')) {
-      setSyncing(true);
-      await updateDoc(doc(db,'contacts',id), {[field]: val});
-      setSyncing(false);
-    }
+  return {
+    initializeApp:() => ({}), getAuth:() => ({}), getFirestore:() => ({}),
+    collection:(db, ...s) => ({ type:"col", path:s.join("/") }),
+    doc:(db, ...s) => ({ type:"doc", path:s.join("/"), id:s[s.length-1] }),
+    query:(ref, ...c) => ({ ...ref, tri:c.filter(x => x && x.tri).map(x => x.tri) }),
+    where:() => ({}), orderBy:(champ, sens="asc") => ({ tri:[champ, sens] }),
+    serverTimestamp:() => maintenant(),
+    onSnapshot:(ref, cb) => { const e = { ref, cb }; ecoutes.add(e); setTimeout(() => cb(snap(ref)), 0); return () => ecoutes.delete(e); },
+    getDoc:async ref => snapDoc(ref), getDocs:async ref => snapCol(ref),
+    addDoc:async (ref, d) => { const id = idNeuf(); store.set(ref.path+"/"+id, clone(d)); avertir(); return { id }; },
+    setDoc:async (ref, d, o) => { store.set(ref.path, o?.merge ? { ...(store.get(ref.path)||{}), ...clone(d) } : clone(d)); avertir(); },
+    updateDoc:async (ref, d) => { if(!store.has(ref.path)) throw new Error("introuvable"); store.set(ref.path, { ...store.get(ref.path), ...clone(d) }); avertir(); },
+    deleteDoc:async ref => { store.delete(ref.path); avertir(); },
+    writeBatch:() => { const ops = []; return { update:(r, d) => ops.push(() => store.set(r.path, { ...store.get(r.path), ...clone(d) })), commit:async () => { ops.forEach(f => f()); avertir(); } }; },
+    onAuthStateChanged:(a, cb) => { abonnes.add(cb); setTimeout(() => cb(utilisateur), 0); return () => abonnes.delete(cb); },
+    signInWithPopup:async () => changer({ email:moi }), signInWithRedirect:async () => changer({ email:moi }),
+    getRedirectResult:async () => null, GoogleAuthProvider:class {},
+    sendSignInLinkToEmail:async () => { throw new Error("pas disponible en démonstration"); },
+    isSignInWithEmailLink:() => false, signInWithEmailLink:async () => {}, signOut:async () => changer(null)
   };
-  inp.addEventListener('blur', commit);
-  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') inp.blur(); if(e.key==='Escape'){inp.value=r[field]||''; inp.blur();} });
 }
 
-async function toggle(id, field, val) {
-  if (!isAdmin) return;
-  setSyncing(true);
-  await updateDoc(doc(db,'contacts',id), {[field]: val});
-  setSyncing(false);
+/* ---------- Lien vers l'outil de soumission (optionnel) ---------- */
+function lienSoumission(o){
+  const base = S.config.lienSoumission; if(!base) return "";
+  let u; try{ u = new URL(base, location.href); }catch(e){ return ""; }
+  if(!/^(https?|file):$/.test(u.protocol)) return "";
+  const p = { source:"korum", nom:o.nom, date:o.date, lieu:o.lieu, debut:o.debut, details:o.details,
+              org:[S.membre?.nom, ID.nom].filter(Boolean).join(" — "), email:moi() };
+  Object.entries(p).forEach(([k,v]) => { if(v) u.searchParams.set(k, v); });
+  return u.toString();
+}
+function boutonSoumission(o){
+  const l = lienSoumission(o);
+  return l ? `<a class="btn-v btn-s" href="${esc(l)}" target="_blank" rel="noopener">Demander des soumissions</a>` : "";
 }
 
-async function del(id) {
-  if (!isAdmin) return;
-  if (!confirm('Supprimer ce contact ?')) return;
-  setSyncing(true);
-  await deleteDoc(doc(db,'contacts',id));
-  setSyncing(false);
+/* ---------- Vue : Tâches ---------- */
+function carteTache(t, opts={}){
+  const e = etq(t.etiquette); const mienne = t.responsable === moi();
+  const boutons = [];
+  if(t.statut !== "termine"){
+    if(!t.responsable) boutons.push(`<button class="btn-v btn-s" data-act="prendre" data-id="${t.id}">Je prends</button>`);
+    else if(mienne) boutons.push(`<button class="btn-s" data-act="retirer" data-id="${t.id}">Je me retire</button>`);
+    if(mienne || estExecutif()){
+      if(t.statut==="a_faire") boutons.push(`<button class="btn-s" data-act="statut" data-id="${t.id}" data-s="en_cours">Commencer</button>`);
+      boutons.push(`<button class="btn-v btn-s" data-act="statut" data-id="${t.id}" data-s="termine">Terminé</button>`);
+    }
+  } else if(estExecutif()) boutons.push(`<button class="btn-s" data-act="statut" data-id="${t.id}" data-s="en_cours">Rouvrir</button>`);
+  const nbCom = t.nbCommentaires ? ` · ${t.nbCommentaires} commentaire${t.nbCommentaires>1?"s":""}` : "";
+  const renc = t.rencontreId ? S.rencontres.find(r=>r.id===t.rencontreId) : null;
+  return `<div class="carte ${t.statut==="termine"?"fini":""}">
+    <div class="ligne">
+      <div>
+        <p class="titre-t">${esc(t.titre)}</p>
+        <p class="meta"><span class="point" style="background:${e.couleur}"></span>${esc(t.etiquette||"")}${t.responsable? " · "+esc(nomDe(t.responsable)) : " · personne"}${t.echeance? " · pour le "+fmtDate(t.echeance,true):""}${nbCom}</p>
+        ${renc && !opts.sansRenc ? `<p class="petit">Issue de : ${esc(renc.type)} du ${fmtDate(renc.date,true)}</p>`:""}
+      </div>
+      <button class="btn-s" data-act="ouvrir-tache" data-id="${t.id}" aria-label="Détails">Détails</button>
+    </div>
+    ${boutons.length? `<div class="actions">${boutons.join("")}</div>`:""}
+  </div>`;
+}
+function vueTaches(){
+  const actives = S.taches.filter(t => !t.archive);
+  const f = S.filtre;
+  const filtrees = actives.filter(t => f==="tous" ? true : f==="moi" ? t.responsable===moi() : t.etiquette===f);
+  const cols = STATUTS.map(([s,l]) => [l, filtrees.filter(t=>t.statut===s)]);
+  const puces = [["tous","Toutes"],["moi","Mes tâches"], ...S.config.etiquettes.map(e=>[e.nom,e.nom])]
+    .map(([v,l]) => `<button class="puce ${f===v?"actif":""}" data-act="filtre" data-v="${esc(v)}">${esc(l)}</button>`).join("");
+  const annonces = S.annonces.slice(0,3).map(a => `<div class="annonce">
+      <p>${esc(a.texte)}</p>
+      <p class="meta">${esc(a.auteurNom||nomDe(a.auteur))} · ${a.date?.seconds? fmtDate(new Date(a.date.seconds*1000).toISOString().slice(0,10),true):""}
+      ${(a.auteur===moi()||estExecutif())? ` · <a href="#" data-act="suppr-annonce" data-id="${a.id}">retirer</a>`:""}</p></div>`).join("");
+  return `
+    <div class="ligne" style="margin-bottom:12px">
+      <p class="muet">${actives.filter(t=>t.statut!=="termine").length} tâche(s) ouverte(s)</p>
+      ${estExecutif()? `<button class="btn-p btn-s" data-act="nouvelle-tache">+ Ajouter</button>`:""}
+    </div>
+    ${annonces || ""}
+    <div style="margin-bottom:14px"><button class="btn-s" data-act="nouvelle-annonce">Publier une annonce</button>
+      ${S.annonces.length>3? ` <button class="btn-s" data-act="toutes-annonces">Toutes les annonces (${S.annonces.length})</button>`:""}</div>
+    <div class="puces">${puces}</div>
+    ${filtrees.length===0 ? `<div class="vide"><strong>Aucune tâche ici</strong>${estExecutif()? "Ajoutez la première ou changez de filtre.":"Rien à faire pour le moment."}</div>` :
+      cols.map(([l,ts]) => ts.length ? `<h2>${l} (${ts.length})</h2>${ts.map(t=>carteTache(t)).join("")}` : "").join("")}
+    <p class="aide" style="margin-top:20px">${esc(RAPPEL)}</p>`;
 }
 
-function toggleAddRow() {
-  if (!isAdmin) return;
-  const b = document.getElementById('add-tbody');
-  b.style.display = b.style.display==='none' ? '' : 'none';
-  if (b.style.display!=='none') document.getElementById('new-org').focus();
+/* ---------- Vue : Rencontres ---------- */
+function vueRencontres(){
+  const auj = aujourdhui();
+  const aVenir = S.rencontres.filter(r => r.date >= auj).sort((a,b)=>a.date.localeCompare(b.date));
+  const passees = S.rencontres.filter(r => r.date < auj);
+  const bloc = (r, accent) => {
+    const e = etq(r.type); const ts = S.taches.filter(t=>t.rencontreId===r.id && !t.archive);
+    const odj = (r.ordreDuJour||[]).map((p,i) => `<li><span><span class="n">${i+1}.</span>${esc(p)}</span>
+      ${estExecutif()? `<button class="btn-s" data-act="nouvelle-tache" data-renc="${r.id}" data-point="${esc(p)}" aria-label="Ajouter une tâche au point ${i+1}">+ tâche</button>`:""}</li>`).join("");
+    return `<div class="carte ${accent?"accent":""}">
+      <p class="titre-t"><span class="point" style="background:${e.couleur};margin-right:6px"></span><strong>${esc(r.type)}</strong> – ${fmtDate(r.date)}${r.heure? ", "+fmtHeure(r.heure):""}</p>
+      <p class="meta">${esc(r.lieu||"")}</p>
+      ${accent ? `<h2>Ordre du jour</h2><ol class="odj">${odj || "<li class='muet'>Pas encore d'ordre du jour</li>"}</ol>` : ""}
+      ${accent && ts.length ? `<h2>Tâches liées</h2>${ts.map(t=>`<div class="sous"><span>${esc(t.titre)}</span><span class="muet">${esc(nomDe(t.responsable))||"personne"} · ${STATUTS.find(s=>s[0]===t.statut)?.[1]||""}</span></div>`).join("")}`:""}
+      ${!accent ? `<p class="petit">${ts.length} tâche(s) · ${ts.filter(t=>t.statut==="termine").length} terminée(s)</p>`:""}
+      <div class="actions">
+        ${r.lienPV ? `<a class="btn-v btn-s" style="text-decoration:none;display:inline-block" href="${esc(r.lienPV)}" target="_blank" rel="noopener">Voir le PV</a>` : `<span class="muet" style="padding:6px 0">Pas de PV</span>`}
+        ${!accent ? `<button class="btn-s" data-act="ouvrir-rencontre" data-id="${r.id}">Ordre du jour et tâches</button>`:""}
+        ${estGestion()? `<button class="btn-s" data-act="modif-rencontre" data-id="${r.id}">Modifier</button>`:""}
+      </div></div>`;
+  };
+  return `
+    <div class="ligne" style="margin-bottom:12px"><p class="muet">Environ une rencontre par mois, plus l'AGA.</p>
+      ${estGestion()? `<button class="btn-p btn-s" data-act="nouvelle-rencontre">+ Nouvelle</button>`:""}</div>
+    <h2>À venir</h2>
+    ${aVenir.length ? aVenir.map((r,i)=>bloc(r, i===0)).join("") : `<div class="vide"><strong>Aucune rencontre planifiée</strong>${estGestion()?"Créez la prochaine.":"La direction annoncera la prochaine date."}</div>`}
+    ${passees.length ? `<h2>Passées</h2>${passees.slice(0,24).map(r=>bloc(r,false)).join("")}`:""}`;
 }
 
-async function addRow() {
-  if (!isAdmin) return;
-  const org = document.getElementById('new-org').value.trim();
-  if (!org) { document.getElementById('new-org').focus(); return; }
-  const id = Date.now().toString();
-  const newRow = { id, org, contact:document.getElementById('new-contact').value.trim(), email:document.getElementById('new-email').value.trim(), type:document.getElementById('new-type').value, sent:false, rep:false, rdv:false, note:'' };
-  setSyncing(true);
-  await setDoc(doc(db,'contacts',id), newRow);
-  setSyncing(false);
-  ['new-org','new-contact','new-email'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('add-tbody').style.display='none';
+/* ---------- Vue : Calendrier ---------- */
+function vueCalendrier(){
+  const auj = aujourdhui();
+  const f = S.filtre==="rencontre"||S.filtre==="evenement" ? S.filtre : "tout";
+  const items = S.calendrier.filter(c => c.date >= auj && (f==="tout" || c.type===f));
+  const groupes = {};
+  items.forEach(c => { const k = c.date.slice(0,7); (groupes[k] ||= []).push(c); });
+  const html = Object.keys(groupes).sort().map(k => { const [a,m] = k.split("-");
+    return `<p class="mois">${MOIS[+m-1][0].toUpperCase()+MOIS[+m-1].slice(1)} ${a}</p>` + groupes[k].map(c => {
+      const [,,j] = c.date.split("-").map(Number); const d = new Date(+a,+m-1,j); const e = c.type==="rencontre" ? etq(c.etiquette||"CA") : null;
+      return `<div class="evt"><div class="jour"><div class="j">${JOURS[d.getDay()]}</div><div class="n">${j}</div></div>
+        <div style="flex:1;min-width:0"><p class="titre-t">${e? `<span class="point" style="background:${e.couleur};margin-right:6px"></span>`:""}${esc(c.titre)}</p>
+          <p class="meta">${c.heure? fmtHeure(c.heure):""}${c.lieu? " · "+esc(c.lieu):""}</p>
+          <div class="actions" style="margin-top:6px"><button class="btn-s" data-act="ics" data-id="${c.id}">Ajouter à mon calendrier</button>
+          ${c.type==="evenement" ? boutonSoumission({ nom:c.titre, date:c.date, lieu:c.lieu, debut:c.heure }) : ""}
+          ${estGestion() && c.type==="evenement"? `<button class="btn-s" data-act="modif-evenement" data-id="${c.id}">Modifier</button>`:""}</div></div></div>`; }).join(""); }).join("");
+  return `
+    <div class="ligne" style="margin-bottom:12px"><p class="muet">Rencontres et événements à venir.</p>
+      ${estGestion()? `<button class="btn-p btn-s" data-act="nouvel-evenement">+ Événement</button>`:""}</div>
+    <div class="puces">${[["tout","Tout"],["rencontre","Rencontres"],["evenement","Événements"]].map(([v,l])=>`<button class="puce ${f===v?"actif":""}" data-act="filtre" data-v="${v}">${l}</button>`).join("")}</div>
+    ${html || `<div class="vide"><strong>Rien à l'horaire</strong>Les rencontres créées apparaissent ici automatiquement.</div>`}`;
 }
 
-function flashMsg(msg, color) {
-  const el = document.getElementById('footer-msg');
-  el.style.color = color || '#4ade80';
-  el.textContent = msg;
-  setTimeout(()=>{ el.style.color=''; el.textContent='Données synchronisées en temps réel avec Firebase.'; }, 4000);
+/* ---------- Vue : Documents ---------- */
+function vueDocuments(){
+  const visibles = S.ressources.filter(r => (r.pour||"tous")==="tous" || niv() >= NIVEAU[r.pour]);
+  const lu = S.membre.codeLuLe;
+  const lignes = visibles.map(r => `<div class="carte"><div class="ligne"><div>
+      <p class="titre-t">${esc(r.titre)}</p>${r.description? `<p class="meta">${esc(r.description)}</p>`:""}
+      ${r.pour && r.pour!=="tous" ? `<p class="petit">Réservé : ${ROLES[r.pour]}</p>`:""}</div>
+      <a class="btn-v btn-s" style="text-decoration:none" href="${esc(r.lien)}" target="_blank" rel="noopener">Ouvrir</a></div>
+      ${r.accuse ? (lu ? `<p class="petit" style="margin-top:8px">Lu le ${fmtDate(lu)}</p>` : `<div class="actions"><button class="btn-p btn-s" data-act="accuse-lecture">J'ai lu et compris ce document</button></div>`) : ""}
+      ${estGestion()? `<div class="actions"><button class="btn-s" data-act="modif-ressource" data-id="${r.id}">Modifier</button></div>`:""}
+    </div>`).join("");
+  return `
+    ${!lu ? `<div class="aide">Bienvenue. Avant votre première rencontre, lisez le code d'éthique et remettez votre déclaration d'intérêts au président.</div>`:""}
+    ${S.config.lienDocuments ? `<a class="btn-p btn-w" style="display:block;text-align:center;text-decoration:none;margin-bottom:16px" href="${esc(S.config.lienDocuments)}" target="_blank" rel="noopener">Ouvrir le dossier partagé ${esc(ID.deNom)}</a>` : (estGestion()? `<div class="aide">Aucun dossier partagé configuré. Ajoutez le lien dans Réglages.</div>`:"")}
+    <div class="ligne" style="margin-bottom:8px"><h2 class="m0">Documents essentiels</h2>${estGestion()? `<button class="btn-s" data-act="modif-ressource">+ Ajouter</button>`:""}</div>
+    ${lignes || `<div class="vide"><strong>Aucun document pour l'instant</strong>Guides, code d'éthique, règlements : ajoutez les liens ici.</div>`}`;
 }
 
-function updateStats() {
-  document.getElementById('s-total').textContent = data.length;
-  document.getElementById('s-sent').textContent = data.filter(r=>r.sent).length;
-  document.getElementById('s-rep').textContent = data.filter(r=>r.rep).length;
-  document.getElementById('s-rdv').textContent = data.filter(r=>r.rdv).length;
+/* ---------- Vues admin ---------- */
+function vueHistorique(){
+  const arch = S.taches.filter(t=>t.archive).sort((a,b)=>(b.termineLe?.seconds||0)-(a.termineLe?.seconds||0));
+  const annees = [...new Set(arch.map(t => t.termineLe?.seconds ? new Date(t.termineLe.seconds*1000).getFullYear() : "?"))];
+  const f = /^\d{4}$/.test(S.filtre) ? +S.filtre : "tout";
+  const liste = arch.filter(t => f==="tout" || (t.termineLe?.seconds && new Date(t.termineLe.seconds*1000).getFullYear()===f));
+  return `<div class="ligne" style="margin-bottom:12px"><p class="muet">${arch.length} tâche(s) archivée(s), visibles par l'admin seulement.</p>
+      <button class="btn-s" data-act="csv">Exporter en CSV</button></div>
+    <div class="puces"><button class="puce ${f==="tout"?"actif":""}" data-act="filtre" data-v="tout">Toutes</button>${annees.map(a=>`<button class="puce ${f===a?"actif":""}" data-act="filtre" data-v="${a}">${a}</button>`).join("")}</div>
+    ${liste.map(t=>carteTache(t)).join("") || `<div class="vide">Rien d'archivé encore. Les tâches terminées y passent après 30 jours.</div>`}`;
+}
+function vueMembres(){
+  const an = new Date().getFullYear();
+  return `<div class="ligne" style="margin-bottom:12px"><p class="muet">${S.membres.length} personne(s) avec accès.</p>
+      ${estAdmin()? `<button class="btn-p btn-s" data-act="modif-membre">+ Ajouter</button>`:""}</div>
+    ${S.membres.map(m => `<div class="carte ${m.actif===false?"fini":""}"><div class="ligne"><div>
+        <p class="titre-t">${esc(m.nom||m.courriel)} <span class="muet">· ${esc(m.titre||"")}${m.titre?" · ":""}${ROLES[m.role]||m.role}</span></p>
+        <p class="meta">${esc(m.courriel)}${m.actif===false? " · désactivé":""}</p>
+        <p class="petit">Code d'éthique : ${m.codeLuLe? "lu le "+fmtDate(m.codeLuLe) : "pas encore lu"} · Déclaration d'intérêts ${an} : ${m.declarationAnnee===an? "reçue":"à recevoir"}</p></div>
+        ${estAdmin()? `<button class="btn-s" data-act="modif-membre" data-id="${m.courriel}">Modifier</button>` : (m.declarationAnnee!==an? `<button class="btn-s" data-act="declaration" data-id="${m.courriel}">Déclaration reçue</button>`:"")}
+      </div></div>`).join("")}`;
+}
+const NUANCES = ["#0B8A2B","#0F6E56","#1B5EA6","#2F5D8A","#534AB7","#993556","#A32D2D","#854F0B","#444441"];
+function contraste(hex){
+  const lum = x => { const v = parseInt(x,16)/255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
+  const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||""); if(!m) return 0;
+  const L = .2126*lum(m[1]) + .7152*lum(m[2]) + .0722*lum(m[3]);
+  return 1.05 / (L + .05);
+}
+function avisCouleur(c){ const k = contraste(c); return k < 3 ? "Couleur trop pâle : le texte blanc des boutons serait illisible. Choisissez plus foncé." : k < 4 ? "Couleur un peu pâle : le texte blanc des boutons sera moins lisible." : ""; }
+function blocIdentite(){
+  const b = S.brouillonId ||= { ...ID };
+  const change = CHAMPS_ID.some(k => (b[k]||"") !== (ID[k]||""));
+  return `<h2>Identité</h2>
+    <div class="carte">
+      <div class="apercu" id="apercu-id" style="--accent:${esc(b.couleur)}">
+        <span class="logo-apercu" id="apercu-logo">${htmlLogo(b)}</span>
+        <div style="min-width:0"><p class="titre-t" id="apercu-nom"><strong>${esc(b.nom)}</strong></p><p class="muet" id="apercu-instance">${esc(b.instance)}</p>
+          <button class="btn-p btn-s" style="margin-top:8px" tabindex="-1" aria-hidden="true">Continuer avec Google</button></div>
+      </div>
+      <p class="petit">Aperçu de l'écran de connexion. Tout le monde voit le changement dès que vous enregistrez.</p>
+      <label for="id-nom">Nom de l'organisme</label><input type="text" id="id-nom" data-champ="nom" value="${esc(b.nom)}" placeholder="Ex. : Comité des loisirs de Sayabec">
+      <label for="id-instance">Instance qui utilise l'outil</label><input type="text" id="id-instance" data-champ="instance" value="${esc(b.instance)}" placeholder="Ex. : Conseil d'administration, Comité organisateur">
+      <label for="id-denom">Le nom dans une phrase, avec « de »</label><input type="text" id="id-denom" data-champ="deNom" value="${esc(b.deNom)}" placeholder="Ex. : de la Chambre, du Comité, de l'Association">
+      <p class="petit" id="apercu-phrase">Donne : « Accès réservé aux membres et à l'équipe ${esc(b.deNom)}. »</p>
+      <label for="id-contact">Personne à contacter pour obtenir un accès</label><input type="text" id="id-contact" data-champ="contactAcces" value="${esc(b.contactAcces)}" placeholder="Ex. : Pascale, à la direction">
+      <label>Couleur</label>
+      <div class="nuancier">${NUANCES.map(k=>`<button class="nuance ${k.toLowerCase()===(b.couleur||"").toLowerCase()?"actif":""}" style="background:${k}" data-act="nuance" data-c="${k}" aria-label="Couleur ${k}"></button>`).join("")}
+        <input type="color" id="id-couleur" value="${esc(/^#[0-9a-f]{6}$/i.test(b.couleur||"")? b.couleur : DEPART.couleur)}" aria-label="Autre couleur"></div>
+      <p class="erreur" id="avis-couleur">${esc(avisCouleur(b.couleur))}</p>
+      <label>Logo</label>
+      <input type="file" id="id-logo" class="fichier-cache" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+      <div class="actions" style="margin-top:0"><label for="id-logo" class="btn-v btn-s btn-fichier">${b.logo ? "Changer le logo" : "Choisir une image"}</label>
+        ${b.logo ? `<button class="btn-s" data-act="retirer-logo">Retirer le logo</button>`:""}</div>
+      <p class="petit">Une image carrée marche le mieux : le symbole seul, sans le texte. Elle est réduite automatiquement. Sans logo, les initiales s'affichent.</p>
+      <p class="erreur" id="err-id"></p>
+      <div class="actions">
+        <button class="btn-p btn-s" data-act="sauver-identite">Enregistrer l'identité</button>
+        ${change ? `<button class="btn-s" data-act="annuler-identite">Annuler les changements</button>`:""}
+      </div>
+    </div>`;
+}
+async function preparerLogo(fichier){
+  if(!fichier || !/^image\//.test(fichier.type)) throw new Error("Choisissez une image (PNG, JPG ou SVG).");
+  const url = URL.createObjectURL(fichier);
+  try{
+    const img = await new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ko(new Error("Cette image n'a pas pu être lue.")); i.src = url; });
+    const w0 = img.naturalWidth || 256, h0 = img.naturalHeight || 256, r = Math.min(1, 256 / Math.max(w0, h0));
+    const w = Math.max(1, Math.round(w0*r)), hh = Math.max(1, Math.round(h0*r));
+    const c = document.createElement("canvas"); c.width = w; c.height = hh;
+    c.getContext("2d").drawImage(img, 0, 0, w, hh);
+    let data = c.toDataURL("image/png");
+    if(data.length > 150000){
+      const g = c.getContext("2d"); g.globalCompositeOperation = "destination-over"; g.fillStyle = "#fff"; g.fillRect(0,0,w,hh);
+      data = c.toDataURL("image/jpeg", .85);
+    }
+    if(data.length > 300000) throw new Error("Image trop lourde, même réduite. Essayez une version plus simple du logo.");
+    return data;
+  } finally { URL.revokeObjectURL(url); }
+}
+function majApercu(){
+  const b = S.brouillonId; if(!b) return;
+  const a = $("#apercu-id"); if(!a) return;
+  a.style.setProperty("--accent", b.couleur);
+  $("#apercu-logo").innerHTML = htmlLogo(b);
+  $("#apercu-nom").innerHTML = `<strong>${esc(b.nom)}</strong>`;
+  $("#apercu-instance").textContent = b.instance;
+  $("#apercu-phrase").textContent = `Donne : « Accès réservé aux membres et à l'équipe ${b.deNom}. »`;
+  $("#avis-couleur").textContent = avisCouleur(b.couleur);
+}
+function lierIdentite(){
+  $$("[data-champ]").forEach(el => el.oninput = () => { S.brouillonId[el.dataset.champ] = el.value; majApercu(); });
+  const coul = $("#id-couleur"); if(coul) coul.oninput = () => { S.brouillonId.couleur = coul.value; $$(".nuance").forEach(n => n.classList.toggle("actif", n.dataset.c.toLowerCase() === coul.value.toLowerCase())); majApercu(); };
+  const f = $("#id-logo"); if(f) f.onchange = async () => {
+    $("#err-id").textContent = "";
+    try{ S.brouillonId.logo = await preparerLogo(f.files[0]); rendre(); toast("Logo prêt. Enregistrez pour l'appliquer."); }
+    catch(e){ $("#err-id").textContent = e.message; f.value = ""; }
+  };
+}
+function vueReglages(){
+  const c = S.config;
+  return `${blocIdentite()}
+    <h2>Dossier partagé</h2>
+    <div class="carte"><label>Lien du dossier partagé (Drive ou OneDrive ${esc(ID.deNom)})</label><input type="url" id="reg-lien" value="${esc(c.lienDocuments||"")}" placeholder="https://…">
+      <div class="actions"><button class="btn-p btn-s" data-act="sauver-lien">Enregistrer</button></div></div>
+    <h2>Demandes de soumissions (optionnel)</h2>
+    <div class="carte"><label for="reg-soum">Lien vers l'outil de demande de soumissions</label>
+      <input type="url" id="reg-soum" value="${esc(c.lienSoumission||"")}" placeholder="https://kihosq.ca/soumission">
+      <p class="petit">Si un lien est entré, un bouton « Demander des soumissions » apparaît sur les événements du calendrier et dans le détail des tâches. Il ouvre l'outil avec le nom, la date, le lieu et votre courriel déjà remplis. Laissez vide pour ne pas l'afficher.</p>
+      <p class="erreur" id="err-soum"></p>
+      <div class="actions"><button class="btn-p btn-s" data-act="sauver-soumission">Enregistrer</button></div></div>
+    <h2>Étiquettes (comités et dossiers)</h2>
+    ${c.etiquettes.map((e,i)=>`<div class="carte"><div class="ligne"><div><p class="titre-t"><span class="point" style="background:${e.couleur};margin-right:6px"></span>${esc(e.nom)} <span class="muet">· ${e.type==="comite"?"comité":"dossier"}</span></p></div>
+      <button class="btn-s" data-act="suppr-etiquette" data-i="${i}">Retirer</button></div></div>`).join("")}
+    <div class="carte"><label>Nouvelle étiquette</label><input type="text" id="etq-nom" placeholder="Nom">
+      <label>Type</label><select id="etq-type"><option value="comite">Comité</option><option value="dossier">Dossier</option></select>
+      <label>Couleur</label><select id="etq-couleur">${COULEURS.map(k=>`<option value="${k}">${k}</option>`).join("")}</select>
+      <div class="actions"><button class="btn-p btn-s" data-act="ajout-etiquette">Ajouter</button></div></div>
+    <h2>Modèle d'ordre du jour</h2>
+    <div class="carte"><textarea id="reg-odj">${esc((c.odjModele||ODJ_DEFAUT).join("\n"))}</textarea>
+      <p class="petit">Un point par ligne. Les dossiers du mois s'insèrent entre « Adoption du procès-verbal » et « Suivi des finances ».</p>
+      <div class="actions"><button class="btn-p btn-s" data-act="sauver-odj">Enregistrer</button></div></div>`;
 }
 
-function copyResume() {
-  const lines = ["🎸 That's Hits — Suivi démarchage", `Date: ${new Date().toLocaleDateString('fr-CA')}`, '', `Contacts: ${data.length}  |  Envoyés: ${data.filter(r=>r.sent).length}  |  Réponses: ${data.filter(r=>r.rep).length}  |  Confirmés: ${data.filter(r=>r.rdv).length}`];
-  const rdv = data.filter(r=>r.rdv);
-  const rep = data.filter(r=>r.rep&&!r.rdv);
-  const pending = data.filter(r=>!r.sent);
-  if (rdv.length) { lines.push('','✅ Confirmés:'); rdv.forEach(r=>lines.push(`  • ${r.org}${r.contact?' ('+r.contact+')':''}${r.note?' — '+r.note:''}`)); }
-  if (rep.length) { lines.push('','💬 Réponses reçues:'); rep.forEach(r=>lines.push(`  • ${r.org}${r.contact?' ('+r.contact+')':''}${r.note?' — '+r.note:''}`)); }
-  if (pending.length) { lines.push('','⏳ Pas encore contactés:'); pending.forEach(r=>lines.push(`  • ${r.org}`)); }
-  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
-    const el = document.getElementById('footer-msg');
-    el.style.color='#4ade80';
-    el.textContent='✓ Résumé copié — colle dans un message au groupe !';
-    setTimeout(()=>{ el.style.color=''; el.textContent='Données synchronisées en temps réel avec Firebase.'; }, 3000);
-  });
+/* ---------- Modales ---------- */
+function modal(html){ $("#modal-racine").innerHTML = `<div class="voile" data-fermer><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
+  $("[data-fermer]").onclick = e => { if(e.target.dataset.fermer!==undefined) fermer(); }; lier(); $(".modal input, .modal textarea, .modal select")?.focus(); }
+function fermer(){ $("#modal-racine").innerHTML = ""; }
+const pied = (ok="Enregistrer", extra="") => `<div class="pied">${extra}<button data-act="fermer">Annuler</button><button class="btn-p" data-act="ok">${ok}</button></div>`;
+let onOk = null;
+
+function selectEtq(v){ return `<select id="f-etq">${S.config.etiquettes.map(e=>`<option ${e.nom===v?"selected":""}>${esc(e.nom)}</option>`).join("")}</select>`; }
+function selectMembre(v){ return `<select id="f-resp"><option value="">Personne (à prendre)</option>${S.membres.filter(m=>m.actif!==false).map(m=>`<option value="${esc(m.courriel)}" ${m.courriel===v?"selected":""}>${esc(m.nom||m.courriel)}</option>`).join("")}</select>`; }
+
+function formTache(t={}, rencId="", point=""){
+  const renc = rencId ? S.rencontres.find(r=>r.id===rencId) : null;
+  modal(`<h1>${t.id? "Modifier la tâche":"Nouvelle tâche"}</h1>
+    ${renc? `<p class="muet">Issue de : ${esc(renc.type)} du ${fmtDate(renc.date,true)}${point? " · point « "+esc(point)+" »":""}</p>`:""}
+    <label>Titre</label><input type="text" id="f-titre" value="${esc(t.titre||"")}" placeholder="Ex. : appeler Buropro pour le contrat du copieur">
+    <label>Précisions (facultatif)</label><textarea id="f-desc">${esc(t.description||"")}</textarea>
+    <label>Étiquette</label>${selectEtq(t.etiquette || renc?.type || "CA")}
+    <label>Responsable</label>${selectMembre(t.responsable||"")}
+    <label>Échéance (facultatif)</label><input type="date" id="f-date" value="${esc(t.echeance||"")}">
+    <p class="erreur" id="f-err"></p>
+    ${pied(t.id? "Enregistrer":"Créer", t.id? `<button class="btn-d" data-act="suppr-tache" data-id="${t.id}">Supprimer</button>`:"")}`);
+  onOk = async () => {
+    const titre = $("#f-titre").value.trim(); if(!titre){ $("#f-err").textContent="Le titre est obligatoire."; return; }
+    const resp = $("#f-resp").value;
+    const data = { titre, description:$("#f-desc").value.trim(), etiquette:$("#f-etq").value, responsable:resp, echeance:$("#f-date").value, modifieLe:serverTimestamp() };
+    if(t.id) await updateDoc(doc(db,"taches",t.id), data);
+    else await addDoc(collection(db,"taches"), { ...data, statut:"a_faire", rencontreId:rencId||t.rencontreId||"", pointOdj:point||"", creePar:moi(), creeLe:serverTimestamp(), archive:false, nbCommentaires:0 });
+    fermer(); toast(t.id? "Tâche enregistrée":"Tâche créée");
+  };
+}
+async function detailTache(id){
+  const t = S.taches.find(x=>x.id===id); if(!t) return;
+  const e = etq(t.etiquette);
+  modal(`<h1>${esc(t.titre)}</h1>
+    <p class="meta"><span class="point" style="background:${e.couleur}"></span>${esc(t.etiquette)} · ${STATUTS.find(s=>s[0]===t.statut)?.[1]} · ${t.responsable? esc(nomDe(t.responsable)) : "personne"}${t.echeance? " · pour le "+fmtDate(t.echeance,true):""}</p>
+    ${t.description? `<p style="margin-top:10px;white-space:pre-wrap">${esc(t.description)}</p>`:""}
+    ${t.pointOdj? `<p class="petit" style="margin-top:6px">Point d'ordre du jour : ${esc(t.pointOdj)}</p>`:""}
+    ${S.config.lienSoumission && t.statut!=="termine" ? `<div class="actions">${boutonSoumission({ nom:t.titre, details:t.description })}</div>`:""}
+    <h2>Commentaires</h2><div id="coms" class="muet">Chargement…</div>
+    <label>Ajouter un commentaire</label><textarea id="f-com" placeholder="Ex. : le devis est arrivé, il est dans le dossier partagé."></textarea>
+    <div class="pied">${estExecutif()? `<button data-act="modif-tache" data-id="${t.id}">Modifier</button>`:""}<button data-act="fermer">Fermer</button><button class="btn-p" data-act="ok">Commenter</button></div>`);
+  const snap = await getDocs(query(collection(db,"taches",id,"commentaires"), orderBy("date","asc")));
+  $("#coms").innerHTML = snap.docs.map(d => { const c=d.data(); return `<div class="sous" style="display:block"><p>${esc(c.texte)}</p><p class="petit">${esc(c.auteurNom||nomDe(c.auteur))} · ${c.date?.seconds? fmtDate(new Date(c.date.seconds*1000).toISOString().slice(0,10),true):""}
+    ${c.auteur===moi()? ` · <a href="#" data-act="suppr-com" data-id="${id}" data-c="${d.id}">retirer</a>`:""}</p></div>`; }).join("") || "<p class='muet'>Aucun commentaire.</p>";
+  lier();
+  onOk = async () => { const texte = $("#f-com").value.trim(); if(!texte) return;
+    await addDoc(collection(db,"taches",id,"commentaires"), { texte, auteur:moi(), auteurNom:S.membre.nom||"", date:serverTimestamp() });
+    await updateDoc(doc(db,"taches",id), { nbCommentaires:(t.nbCommentaires||0)+1, modifieLe:serverTimestamp() });
+    toast("Commentaire ajouté"); detailTache(id); };
+}
+function formRencontre(r={}){
+  const odj = r.ordreDuJour || (S.config.odjModele||ODJ_DEFAUT);
+  modal(`<h1>${r.id? "Modifier la rencontre":"Nouvelle rencontre"}</h1>
+    <label>Type</label>${selectEtq(r.type||"CA")}
+    <label>Date</label><input type="date" id="f-date" value="${esc(r.date||"")}">
+    <label>Heure</label><input type="time" id="f-heure" value="${esc(r.heure||"18:30")}">
+    <label>Lieu</label><input type="text" id="f-lieu" value="${esc(r.lieu||"")}" placeholder="Ex. : salle du conseil">
+    <label>Ordre du jour (un point par ligne)</label><textarea id="f-odj" style="min-height:190px">${esc(odj.join("\n"))}</textarea>
+    <label>Lien vers le PV (Word dans le dossier partagé)</label><input type="url" id="f-pv" value="${esc(r.lienPV||"")}" placeholder="https://…">
+    <p class="erreur" id="f-err"></p>
+    ${pied(r.id? "Enregistrer":"Créer", r.id? `<button class="btn-d" data-act="suppr-rencontre" data-id="${r.id}">Supprimer</button>`:"")}`);
+  onOk = async () => {
+    const date = $("#f-date").value; if(!date){ $("#f-err").textContent="La date est obligatoire."; return; }
+    const data = { type:$("#f-etq").value, date, heure:$("#f-heure").value, lieu:$("#f-lieu").value.trim(),
+      ordreDuJour:$("#f-odj").value.split("\n").map(s=>s.trim()).filter(Boolean), lienPV:$("#f-pv").value.trim(), modifieLe:serverTimestamp() };
+    let id = r.id;
+    if(id) await updateDoc(doc(db,"rencontres",id), data); else { id = (await addDoc(collection(db,"rencontres"), { ...data, creePar:moi(), creeLe:serverTimestamp() })).id; }
+    await setDoc(doc(db,"calendrier","renc_"+id), { date, heure:data.heure, titre:data.type, type:"rencontre", etiquette:data.type, lieu:data.lieu, rencontreId:id });
+    fermer(); toast("Rencontre enregistrée");
+  };
+}
+function formEvenement(c={}){
+  modal(`<h1>${c.id? "Modifier l'événement":"Nouvel événement"}</h1>
+    <label>Titre</label><input type="text" id="f-titre" value="${esc(c.titre||"")}" placeholder="Ex. : Gala reconnaissance">
+    <label>Date</label><input type="date" id="f-date" value="${esc(c.date||"")}">
+    <label>Heure (facultatif)</label><input type="time" id="f-heure" value="${esc(c.heure||"")}">
+    <label>Lieu</label><input type="text" id="f-lieu" value="${esc(c.lieu||"")}">
+    <p class="erreur" id="f-err"></p>
+    ${pied(c.id? "Enregistrer":"Créer", c.id? `<button class="btn-d" data-act="suppr-evenement" data-id="${c.id}">Supprimer</button>`:"")}`);
+  onOk = async () => {
+    const titre=$("#f-titre").value.trim(), date=$("#f-date").value;
+    if(!titre||!date){ $("#f-err").textContent="Titre et date sont obligatoires."; return; }
+    const data = { titre, date, heure:$("#f-heure").value, lieu:$("#f-lieu").value.trim(), type:"evenement" };
+    if(c.id) await updateDoc(doc(db,"calendrier",c.id), data); else await addDoc(collection(db,"calendrier"), data);
+    fermer(); toast("Événement enregistré");
+  };
+}
+function formAnnonce(){
+  modal(`<h1>Publier une annonce</h1><p class="muet">Une info courte pour tout le monde. Pour discuter d'une tâche, commentez-la plutôt.</p>
+    <label>Texte</label><textarea id="f-texte" placeholder="Ex. : le devis du copieur est arrivé, il est dans le dossier partagé."></textarea>
+    ${estExecutif()? `<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="f-ep" style="width:auto"> Épingler en haut</label>`:""}
+    ${pied("Publier")}`);
+  onOk = async () => { const texte=$("#f-texte").value.trim(); if(!texte) return;
+    await addDoc(collection(db,"annonces"), { texte, auteur:moi(), auteurNom:S.membre.nom||"", date:serverTimestamp(), epingle: !!$("#f-ep")?.checked });
+    fermer(); toast("Annonce publiée"); };
+}
+function formRessource(r={}){
+  modal(`<h1>${r.id? "Modifier le document":"Ajouter un document"}</h1>
+    <label>Titre</label><input type="text" id="f-titre" value="${esc(r.titre||"")}" placeholder="Ex. : Code d'éthique de l'administrateur">
+    <label>Description courte (facultatif)</label><input type="text" id="f-desc" value="${esc(r.description||"")}">
+    <label>Lien (fichier dans le dossier partagé)</label><input type="url" id="f-lien" value="${esc(r.lien||"")}" placeholder="https://…">
+    <label>Visible par</label><select id="f-pour">${[["tous","Tout le monde"],["executif","Exécutif et plus"],["gestion","Gestion et admin"],["admin","Admin seulement"]].map(([v,l])=>`<option value="${v}" ${(r.pour||"tous")===v?"selected":""}>${l}</option>`).join("")}</select>
+    <label>Ordre d'affichage</label><input type="text" id="f-ordre" value="${esc(r.ordre??10)}" inputmode="numeric">
+    <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="f-acc" style="width:auto" ${r.accuse?"checked":""}> Demander un accusé de lecture (code d'éthique)</label>
+    <p class="erreur" id="f-err"></p>
+    ${pied("Enregistrer", r.id? `<button class="btn-d" data-act="suppr-ressource" data-id="${r.id}">Supprimer</button>`:"")}`);
+  onOk = async () => { const titre=$("#f-titre").value.trim(), lien=$("#f-lien").value.trim();
+    if(!titre||!lien){ $("#f-err").textContent="Titre et lien sont obligatoires."; return; }
+    const data = { titre, description:$("#f-desc").value.trim(), lien, pour:$("#f-pour").value, ordre:+$("#f-ordre").value||10, accuse:$("#f-acc").checked };
+    if(r.id) await updateDoc(doc(db,"ressources",r.id), data); else await addDoc(collection(db,"ressources"), data);
+    fermer(); toast("Document enregistré"); };
+}
+function formMembre(m={}){
+  modal(`<h1>${m.courriel? "Modifier l'accès":"Ajouter une personne"}</h1>
+    <label>Courriel (celui de son compte Google, ou l'adresse où recevoir le lien de connexion)</label><input type="email" id="f-courriel" value="${esc(m.courriel||"")}" ${m.courriel?"disabled":""} placeholder="nom@exemple.ca">
+    <label>Nom</label><input type="text" id="f-nom" value="${esc(m.nom||"")}">
+    <label>Titre (facultatif)</label><input type="text" id="f-titre" value="${esc(m.titre||"")}" placeholder="Ex. : Présidente, Directrice générale, Trésorier, Secrétaire">
+    <label>Rôle (niveau d'accès)</label><select id="f-role">${Object.entries(ROLES).map(([v,l])=>`<option value="${v}" ${(m.role||"membre")===v?"selected":""}>${l}</option>`).join("")}</select>
+    <p class="petit">Membre : prend des tâches, commente, publie des annonces. Exécutif : crée et assigne les tâches. Gestion : rencontres, calendrier, documents. Admin : membres et historique.</p>
+    <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="f-actif" style="width:auto" ${m.actif===false?"":"checked"}> Accès actif</label>
+    <label>Déclaration d'intérêts reçue pour</label><input type="text" id="f-decl" value="${esc(m.declarationAnnee||"")}" inputmode="numeric" placeholder="Ex. : ${new Date().getFullYear()}">
+    <p class="erreur" id="f-err"></p>
+    ${pied()}`);
+  onOk = async () => { const courriel=(m.courriel||$("#f-courriel").value).trim().toLowerCase(); const nom=$("#f-nom").value.trim();
+    if(!courriel.includes("@")||!nom){ $("#f-err").textContent="Courriel et nom sont obligatoires."; return; }
+    const data = { nom, titre:$("#f-titre").value.trim(), role:$("#f-role").value, actif:$("#f-actif").checked, declarationAnnee:+$("#f-decl").value||null };
+    await setDoc(doc(db,"membres",courriel), data, { merge:true });
+    fermer(); toast("Accès enregistré"); };
+}
+function menuMoi(){
+  const m = S.membre;
+  modal(`<h1>${esc(m.nom||m.courriel)}</h1><p class="muet">${m.titre?esc(m.titre)+" · ":""}${esc(m.courriel)} · ${ROLES[m.role]}</p>
+    <div class="actions" style="flex-direction:column;align-items:stretch;margin-top:16px">
+      ${estGestion()? `<button data-act="vue" data-v="membres">Membres et déclarations d'intérêts</button>`:""}
+      ${estGestion()? `<button data-act="vue" data-v="reglages">Réglages (nom, couleur, logo, étiquettes, ordre du jour)</button>`:""}
+      ${estAdmin()? `<button data-act="vue" data-v="historique">Historique des tâches archivées</button>`:""}
+      <button class="btn-d" data-act="deco">Se déconnecter</button>
+    </div><div class="pied"><button data-act="fermer">Fermer</button></div>`);
 }
 
-document.getElementById('search').addEventListener('input', render);
-document.getElementById('filter-type').addEventListener('change', render);
-document.getElementById('filter-status').addEventListener('change', render);
-document.getElementById('new-org').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('new-contact').focus(); });
-document.getElementById('new-contact').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('new-email').focus(); });
-document.getElementById('new-email').addEventListener('keydown', e=>{ if(e.key==='Enter') addRow(); });
-document.getElementById('pwd-input').addEventListener('keydown', e=>{ if(e.key==='Enter') loginAdmin(); });
-document.getElementById('mail-input').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('pwd-input').focus(); });
+/* ---------- Actions ---------- */
+function ics(c){
+  const dt = c.date.replace(/-/g,""); const h = (c.heure||"").replace(":","");
+  const debut = h ? `DTSTART;TZID=${FUSEAU}:${dt}T${h}00` : `DTSTART;VALUE=DATE:${dt}`;
+  const fin = h ? `DTEND;TZID=${FUSEAU}:${dt}T${String(+h.slice(0,2)+2).padStart(2,"0")}${h.slice(2)}00` : `DTEND;VALUE=DATE:${dt}`;
+  const txt = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Korum//FR","BEGIN:VEVENT",`UID:${c.id}@korum`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,"").slice(0,15)}Z`,debut,fin,`SUMMARY:${c.titre} – ${ID.nom}`,`LOCATION:${c.lieu||""}`,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a"); a.href = "data:text/calendar;charset=utf-8,"+encodeURIComponent(txt); a.download = `${c.titre.replace(/\W+/g,"-")}-${c.date}.ics`; a.click();
+}
+const ACTIONS = {
+  fermer: () => fermer(),
+  ok: () => onOk && onOk().catch(e => { const z=$("#f-err"); if(z) z.textContent = "Enregistrement refusé : " + e.message; else toast("Erreur : "+e.message); }),
+  filtre: d => { S.filtre = d.v; rendre(); },
+  vue: d => { fermer(); S.vueAdmin = d.v; S.filtre="tout"; S.brouillonId = null; rendre(); },
+  deco: () => signOut(auth),
+  "nouvelle-tache": d => formTache({}, d.renc||"", d.point||""),
+  "modif-tache": d => { fermer(); formTache(S.taches.find(t=>t.id===d.id)); },
+  "ouvrir-tache": d => detailTache(d.id),
+  prendre: d => updateDoc(doc(db,"taches",d.id), { responsable:moi(), modifieLe:serverTimestamp() }).then(()=>toast("C'est à vous")).catch(e=>toast("Refusé : "+e.message)),
+  retirer: d => updateDoc(doc(db,"taches",d.id), { responsable:"", modifieLe:serverTimestamp() }).catch(e=>toast("Refusé : "+e.message)),
+  statut: d => updateDoc(doc(db,"taches",d.id), { statut:d.s, modifieLe:serverTimestamp(), termineLe: d.s==="termine" ? serverTimestamp() : null }).then(()=>toast(d.s==="termine"?"Terminé":"Statut changé")).catch(e=>toast("Refusé : "+e.message)),
+  "suppr-tache": async d => { if(!confirm("Supprimer cette tâche ?")) return; await deleteDoc(doc(db,"taches",d.id)); fermer(); toast("Tâche supprimée"); },
+  "suppr-com": async d => { await deleteDoc(doc(db,"taches",d.id,"commentaires",d.c)); detailTache(d.id); },
+  "nouvelle-annonce": () => formAnnonce(),
+  "suppr-annonce": d => deleteDoc(doc(db,"annonces",d.id)).catch(e=>toast("Refusé : "+e.message)),
+  "toutes-annonces": () => modal(`<h1>Annonces</h1>${S.annonces.map(a=>`<div class="annonce"><p>${esc(a.texte)}</p><p class="meta">${esc(a.auteurNom||nomDe(a.auteur))}${(a.auteur===moi()||estExecutif())? ` · <a href="#" data-act="suppr-annonce" data-id="${a.id}">retirer</a>`:""}</p></div>`).join("")}<div class="pied"><button data-act="fermer">Fermer</button></div>`),
+  "nouvelle-rencontre": () => formRencontre(),
+  "modif-rencontre": d => formRencontre(S.rencontres.find(r=>r.id===d.id)),
+  "ouvrir-rencontre": d => { const r=S.rencontres.find(x=>x.id===d.id); const ts=S.taches.filter(t=>t.rencontreId===r.id);
+    modal(`<h1>${esc(r.type)} – ${fmtDate(r.date)}</h1><h2>Ordre du jour</h2><ol class="odj">${(r.ordreDuJour||[]).map((p,i)=>`<li><span><span class="n">${i+1}.</span>${esc(p)}</span></li>`).join("")}</ol>
+      <h2>Tâches issues (${ts.length})</h2>${ts.map(t=>carteTache(t,{sansRenc:true})).join("")||"<p class='muet'>Aucune.</p>"}<div class="pied"><button data-act="fermer">Fermer</button></div>`); },
+  "suppr-rencontre": async d => { if(!confirm("Supprimer cette rencontre ? Les tâches liées restent.")) return; await deleteDoc(doc(db,"rencontres",d.id)); await deleteDoc(doc(db,"calendrier","renc_"+d.id)).catch(()=>{}); fermer(); toast("Rencontre supprimée"); },
+  "nouvel-evenement": () => formEvenement(),
+  "modif-evenement": d => formEvenement(S.calendrier.find(c=>c.id===d.id)),
+  "suppr-evenement": async d => { if(!confirm("Supprimer cet événement ?")) return; await deleteDoc(doc(db,"calendrier",d.id)); fermer(); toast("Événement supprimé"); },
+  ics: d => ics(S.calendrier.find(c=>c.id===d.id)),
+  "modif-ressource": d => formRessource(d.id? S.ressources.find(r=>r.id===d.id) : {}),
+  "suppr-ressource": async d => { if(!confirm("Retirer ce document de la liste ? Le fichier reste dans le dossier partagé.")) return; await deleteDoc(doc(db,"ressources",d.id)); fermer(); toast("Document retiré"); },
+  "accuse-lecture": async () => { await updateDoc(doc(db,"membres",moi()), { codeLuLe:aujourdhui() }); S.membre.codeLuLe = aujourdhui(); toast("Merci, c'est noté"); rendre(); },
+  "modif-membre": d => formMembre(d.id? S.membres.find(m=>m.courriel===d.id) : {}),
+  declaration: d => updateDoc(doc(db,"membres",d.id), { declarationAnnee:new Date().getFullYear() }).then(()=>toast("Déclaration notée")).catch(e=>toast("Refusé : "+e.message)),
+  nuance: d => { S.brouillonId.couleur = d.c; rendre(); },
+  "retirer-logo": () => { S.brouillonId.logo = ""; rendre(); },
+  "annuler-identite": () => { S.brouillonId = { ...ID }; rendre(); },
+  "sauver-identite": async () => {
+    const b = S.brouillonId, err = $("#err-id");
+    const propre = {}; CHAMPS_ID.forEach(k => propre[k] = String(b[k] ?? "").trim());
+    propre.logo = b.logo || "";
+    if(!propre.nom){ err.textContent = "Le nom de l'organisme est obligatoire."; return; }
+    if(!propre.deNom){ err.textContent = "Écrivez le nom dans une phrase, avec « de » (ex. : de la Chambre)."; return; }
+    if(!propre.instance) propre.instance = DEPART.instance;
+    if(!propre.contactAcces) propre.contactAcces = DEPART.contactAcces;
+    if(contraste(propre.couleur) < 3){ err.textContent = "Choisissez une couleur plus foncée avant d'enregistrer."; return; }
+    try{ await setDoc(doc(db,"config","public"), propre); S.brouillonId = { ...propre }; toast("Identité enregistrée"); }
+    catch(e){ err.textContent = "Enregistrement refusé : " + e.message; }
+  },
+  "sauver-soumission": () => {
+    const v = $("#reg-soum").value.trim();
+    if(v && !/^https:\/\//.test(v)){ $("#err-soum").textContent = "Le lien doit commencer par https://"; return; }
+    setDoc(doc(db,"config","general"), { lienSoumission:v }, { merge:true }).then(()=>toast(v? "Bouton activé":"Bouton retiré"));
+  },
+  "sauver-lien": () => setDoc(doc(db,"config","general"), { lienDocuments:$("#reg-lien").value.trim() }, { merge:true }).then(()=>toast("Lien enregistré")),
+  "sauver-odj": () => setDoc(doc(db,"config","general"), { odjModele:$("#reg-odj").value.split("\n").map(s=>s.trim()).filter(Boolean) }, { merge:true }).then(()=>toast("Modèle enregistré")),
+  "ajout-etiquette": () => { const nom=$("#etq-nom").value.trim(); if(!nom) return;
+    setDoc(doc(db,"config","general"), { etiquettes:[...S.config.etiquettes, { nom, type:$("#etq-type").value, couleur:$("#etq-couleur").value }] }, { merge:true }).then(()=>toast("Étiquette ajoutée")); },
+  "suppr-etiquette": d => { if(!confirm("Retirer cette étiquette ? Les tâches existantes la gardent.")) return;
+    setDoc(doc(db,"config","general"), { etiquettes:S.config.etiquettes.filter((_,i)=>i!==+d.i) }, { merge:true }); },
+  csv: () => { const lignes=[["Titre","Étiquette","Responsable","Statut","Échéance","Terminé le","Créé par"]];
+    S.taches.filter(t=>t.archive).forEach(t=>lignes.push([t.titre,t.etiquette,nomDe(t.responsable),t.statut,t.echeance||"",t.termineLe?.seconds? new Date(t.termineLe.seconds*1000).toISOString().slice(0,10):"",nomDe(t.creePar)]));
+    const csv = "\uFEFF"+lignes.map(l=>l.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\r\n");
+    const a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv); a.download=`korum-historique-${aujourdhui()}.csv`; a.click(); }
+};
+document.addEventListener("keydown", e => { if(e.key==="Escape") fermer(); });
 </script>
 </body>
 </html>
